@@ -1,0 +1,6995 @@
+## ✅ **FINAL SOURCE LIST (END-TO-END PROJECT VIEW)**
+
+### 1️⃣ **On-Premises Databases**
+
+**Where it lives:**
+
+* Client data center (SQL Server / Oracle)
+
+**What we ingest:**
+
+* Property master
+* Building & unit details
+* Lease & contract data
+* Client / tenant master
+* Availability & rent details
+
+**Why this source exists:**
+👉 This is the **system of record** for core operations
+
+---
+
+### 2️⃣ **Salesforce CRM**
+
+**Where it lives:**
+
+* Salesforce cloud
+
+**What we ingest:**
+
+* Leads
+* Opportunities
+* Accounts
+* Deal pipeline stages
+* Sales activities
+
+**How we ingest:**
+
+* Native ADF Salesforce connector
+
+**Why this source exists:**
+👉 Sales & client relationship data (not operational truth)
+
+---
+
+### 3️⃣ **Third-Party REST APIs – Demographic / Geospatial**
+
+**Where it lives:**
+
+* External providers (maps, census, geo services)
+
+**What we ingest:**
+
+* Latitude / longitude
+* Area classification
+* Nearby POIs (schools, metro, hospitals)
+* Population & income indicators
+
+**Why this source exists:**
+👉 Location intelligence & valuation enrichment
+
+---
+
+### 4️⃣ **Third-Party REST APIs – Business Registry (Companies House)**
+
+**Where it lives:**
+
+* UK government registry
+
+**What we ingest:**
+
+* Company status (active / dissolved)
+* Directors & officers
+* Filing & compliance flags
+
+**Why this source exists:**
+👉 Due diligence & risk validation before deals
+
+---
+
+### 5️⃣ **SharePoint (Business Uploads)**
+
+**Where it lives:**
+
+* Microsoft SharePoint sites
+
+**What we ingest (metadata + binaries):**
+
+* Property reference Excel files
+* Lease summaries
+* Operational spreadsheets
+* Building images & floor-plan PDFs (upload source)
+
+**Why this source exists:**
+👉 Business-managed documents & manual inputs
+
+---
+
+### 6️⃣ **Blob Storage / ADLS Gen2 (Raw Assets)**
+
+**Where it lives:**
+
+* Azure ADLS Gen2 / Blob Storage
+
+**What lands here:**
+
+* Images & PDFs copied from SharePoint
+* Raw JSON from APIs
+* Raw extracts from ADF pipelines
+
+**Why this source exists:**
+👉 Scalable storage + website asset serving
+
+---
+
+## 🔒 **ONE-LINE MEMORY LOCK**
+
+> We ingest structured operational data from on-prem databases and CRM, enrich it using third-party APIs, and ingest business-managed documents and assets from SharePoint, which are ultimately stored and served from ADLS Gen2.
+
+
+Perfect 👍
+We’ll do this **like a clean mind-map**, **sequential**, **no jumping**, **no extra theory**.
+
+Below is the **FINAL, INTERVIEW-READY mapping** of
+👉 **WHICH TOOL ingests WHICH SOURCE**
+👉 **WHY that tool**
+👉 **How to remember it easily**
+
+---
+
+# 🧠 MASTER RULE (LOCK THIS FIRST)
+
+> **ADF = connectors + structured sources**
+> **Airflow = custom logic + APIs without connectors**
+
+If you remember **only this**, you won’t get lost.
+
+---
+
+# 🗺️ TOOL → SOURCE MAPPING (FINAL)
+
+## 1️⃣ **On-Premises Databases**
+
+**Tool used:** ✅ **ADF**
+
+**Why ADF?**
+
+* Native JDBC / ODBC support
+* Watermark / CDC patterns
+* Stable schemas
+* Enterprise standard
+
+**Data ingested:**
+
+* Property master
+* Units / floors
+* Leases
+* Clients / tenants
+
+**Mental note:**
+👉 *“Database = ADF”*
+
+---
+
+## 2️⃣ **Salesforce CRM**
+
+**Tool used:** ✅ **ADF (Salesforce Connector)**
+
+**Why ADF?**
+
+* Native Salesforce connector
+* Handles auth, pagination, bulk API
+* Incremental fields (`LastModifiedDate`)
+* No custom coding needed
+
+**Data ingested:**
+
+* Leads
+* Opportunities
+* Accounts
+* Sales pipeline
+
+**Mental note:**
+👉 *“CRM with connector = ADF”*
+
+---
+
+## 3️⃣ **SharePoint (Excel, Lists, Docs)**
+
+**Tool used:** ✅ **ADF (SharePoint Connector)**
+
+**Why ADF?**
+
+* Native SharePoint / M365 connector
+* Reads files & lists
+* Business-managed uploads
+* Simple, stable ingestion
+
+**Data ingested:**
+
+* Property reference Excel files
+* Lease summaries
+* Operational spreadsheets
+* Image/PDF upload source
+
+**Mental note:**
+👉 *“Business files = ADF”*
+
+---
+
+## 4️⃣ **Third-Party REST APIs – Demographic / Geospatial**
+
+**Tool used:** ✅ **Airflow**
+
+**Why Airflow?**
+
+* No enterprise connector
+* Per-record API calls
+* Pagination
+* Rate limits
+* Retry + skip logic
+* Schema varies
+
+**Data ingested:**
+
+* Latitude / longitude
+* POIs
+* Population & income indicators
+
+**Mental note:**
+👉 *“API without connector = Airflow”*
+
+---
+
+## 5️⃣ **Third-Party REST APIs – Companies House (Business Registry)**
+
+**Tool used:** ✅ **Airflow**
+
+**Why Airflow?**
+
+* Government API
+* Cursor-based pagination
+* Partial failures expected
+* Multiple endpoints
+* No ADF connector
+
+**Data ingested:**
+
+* Company status
+* Directors
+* Filing flags
+
+**Mental note:**
+👉 *“Regulatory API = Airflow”*
+
+---
+
+## 6️⃣ **Images & PDFs → Blob / ADLS Gen2**
+
+**Tool used:** ✅ **ADF Copy Activity**
+
+**Why ADF?**
+
+* Binary file copy
+* No transformation
+* Preserves folder structure
+* Scales well
+
+**Data ingested:**
+
+* Building images
+* Floor-plan PDFs
+
+**Mental note:**
+👉 *“File movement = ADF Copy”*
+
+---
+
+# 🧠 ONE CLEAN SUMMARY TABLE (MEMORIZE THIS)
+
+| Source              | Tool    |
+| ------------------- | ------- |
+| On-prem DB          | ADF     |
+| Salesforce CRM      | ADF     |
+| SharePoint          | ADF     |
+| Images / PDFs copy  | ADF     |
+| Demographic APIs    | Airflow |
+| Companies House API | Airflow |
+
+---
+
+# 🎯 INTERVIEW-SAFE ONE-LINER (VERY IMPORTANT)
+
+Say this **exactly**:
+
+> We used Azure Data Factory for structured sources and systems with native connectors such as on-prem databases, Salesforce CRM, SharePoint, and binary file movement. Apache Airflow was used for third-party and regulatory REST APIs that required custom pagination, retry, and failure-handling logic.
+
+This is **senior-level**, **Big-4-accurate**, and **trap-proof**.
+
+---
+
+# 🔒 FINAL MEMORY LOCK (STICK THIS)
+
+> **ADF = connectors & files**
+> **Airflow = APIs & logic**
+
+Got it 👍
+Now I’ll do this **properly, slowly, and end-to-end**, exactly the way **Big-4 data engineers actually explain it** in design walkthroughs and interviews.
+
+I will give you:
+
+1. **One clear diagram (mental + visual)**
+2. **Detailed step-by-step simulation**
+3. **What happens in ADF internally**
+4. **What tables look like**
+5. **What can fail + how it’s handled**
+6. **How this cleanly hands off to Databricks**
+
+No skipping. No shortcuts.
+
+
+
+---
+
+# 🔷 COMPLETE BIG-4 INGESTION SIMULATION (ADF → BRONZE)
+
+We are simulating **ONE production-grade ingestion framework** used for:
+
+* On-prem SQL
+* Salesforce CRM
+* SharePoint (lists + files)
+
+> ❗ This pipeline **ENDS at ADLS Gen2 Bronze**
+> ❗ Databricks starts only after this
+
+---
+
+## 🧠 FIRST: WHAT PROBLEM THIS PIPELINE SOLVES
+
+Business reality:
+
+* 100+ source tables
+* Different systems
+* Daily incremental loads
+* Zero data loss
+* Easy onboarding of new tables
+
+❌ Hard-coded pipelines don’t scale
+❌ Full reloads waste time
+❌ Manual changes cause errors
+
+👉 **Solution: Metadata-driven + Watermark-based ingestion**
+
+---
+
+# 🧩 CONTROL TABLES (THE BRAIN OF THE SYSTEM)
+
+These tables live in an **Azure SQL DB / control DB**.
+
+---
+
+## 🟦 1️⃣ METADATA TABLE (CONFIGURATION)
+
+This table tells the pipeline **WHAT to do**.
+
+### `etl_metadata`
+
+```
+source_type     -- SQL / CRM / SHAREPOINT
+source_name     -- onprem_sql / salesforce / sp_site
+schema_name
+object_name     -- table / object / list
+cdc_column      -- last_modified / updated_at
+load_type       -- FULL / INCREMENTAL
+target_container-- bronze
+is_active       -- Y / N
+```
+
+### Example rows:
+
+| source_type | object_name     | cdc_column       | load_type |
+| ----------- | --------------- | ---------------- | --------- |
+| SQL         | property_master | updated_at       | INCR      |
+| CRM         | Opportunity     | LastModifiedDate | INCR      |
+| SP          | Property_List   | modified         | INCR      |
+
+👉 **No pipeline code changes needed** to add a new table
+👉 Just insert a new row here
+
+---
+
+## 🟩 2️⃣ WATERMARK TABLE (MEMORY)
+
+This table remembers **till where data was loaded last time**.
+
+### `etl_watermark`
+
+```
+object_name
+last_cdc_value
+last_success_run
+```
+
+Example:
+
+| object_name     | last_cdc_value   |
+| --------------- | ---------------- |
+| property_master | 2025-01-10 23:45 |
+| Opportunity     | 2025-01-10 22:30 |
+
+👉 Without this → duplicates or data loss
+
+---
+
+# 🔁 NOW THE ACTUAL PIPELINE FLOW (SIMULATED)
+
+This is a **single Azure Data Factory pipeline**.
+
+---
+
+## 🔵 STEP 0️⃣ — SET VARIABLES
+
+### What happens
+
+ADF initializes:
+
+* `run_id` → `20250111_010000`
+* `batch_time` → `2025-01-11 01:00:00`
+
+### Why
+
+* Logging
+* Debugging
+* Audit trail
+
+📌 **Nothing is loaded yet**
+
+---
+
+## 🔵 STEP 1️⃣ — LOOKUP: READ METADATA
+
+ADF runs:
+
+```
+SELECT *
+FROM etl_metadata
+WHERE is_active = 'Y'
+```
+
+### Output (array):
+
+```
+[
+  { property_master },
+  { Opportunity },
+  { Property_List }
+]
+```
+
+👉 This array is passed to **ForEach**
+
+---
+
+## 🔵 STEP 2️⃣ — FOREACH (LOOP)
+
+ADF now loops **one object at a time**.
+
+Let’s simulate **ONE iteration**:
+
+> Example: `property_master` (on-prem SQL)
+
+---
+
+## 🔵 STEP 3️⃣ — LOOKUP WATERMARK
+
+ADF queries:
+
+```
+SELECT last_cdc_value
+FROM etl_watermark
+WHERE object_name = 'property_master'
+```
+
+### Returns:
+
+```
+2025-01-10 23:45
+```
+
+👉 This value is stored in a pipeline variable
+
+---
+
+## 🔵 STEP 4️⃣ — COPY ACTIVITY (THE REAL INGESTION)
+
+### Source (on-prem SQL)
+
+ADF dynamically builds query:
+
+```
+SELECT *
+FROM property_master
+WHERE updated_at > '2025-01-10 23:45'
+```
+
+### Sink (ADLS Gen2 Bronze)
+
+```
+abfss://bronze@adls/property_master/
+  load_date=2025-01-11/
+```
+
+### What is written
+
+* Raw rows
+* Incremental only
+* Parquet format
+* No transformation
+
+👉 **This is the OFFICIAL ingestion boundary**
+
+---
+
+## 🔵 STEP 5️⃣ — UPDATE WATERMARK (ONLY IF COPY SUCCEEDS)
+
+ADF runs stored procedure:
+
+```
+UPDATE etl_watermark
+SET last_cdc_value = '2025-01-11 00:58'
+WHERE object_name = 'property_master'
+```
+
+### Why AFTER success only
+
+❌ If copy fails → watermark must NOT move
+✅ Guarantees correctness
+
+---
+
+## 🔁 LOOP CONTINUES
+
+Next iterations:
+
+* Salesforce Opportunity
+* SharePoint Property_List
+* SharePoint files (images/PDFs via Copy)
+
+Each follows **exact same pattern**.
+
+---
+
+# 📦 WHAT BRONZE LOOKS LIKE AFTER PIPELINE
+
+```
+ADLS Gen2
+└── bronze/
+    ├── property_master/
+    │   └── load_date=2025-01-11/
+    ├── Opportunity/
+    │   └── load_date=2025-01-11/
+    └── Property_List/
+        └── load_date=2025-01-11/
+```
+
+✔ Raw
+✔ Incremental
+✔ Replayable
+✔ Auditable
+
+---
+
+# ❌ WHAT IS INTENTIONALLY NOT DONE IN ADF
+
+This is VERY IMPORTANT for interviews:
+
+❌ Deduplication
+❌ Joins
+❌ Data quality rules
+❌ Business logic
+❌ Schema evolution
+
+👉 **ADF stops at Bronze**
+
+---
+
+# 🟣 HAND-OFF TO DATABRICKS (CLEAN BOUNDARY)
+
+Now Databricks starts:
+
+```
+ADF → Bronze
+Databricks → Silver → Gold
+```
+
+Databricks:
+
+* Reads Bronze
+* Cleans
+* Deduplicates
+* Applies business logic
+* Serves OLTP & OLAP
+
+---
+
+# 🎯 INTERVIEW TRAPS + SAFE ANSWERS
+
+### ❓ Why metadata-driven?
+
+> To scale ingestion without redeploying pipelines.
+
+### ❓ What if one table fails?
+
+> Other tables still load; watermark isn’t updated for the failed one.
+
+### ❓ Why stop at Bronze?
+
+> To keep ingestion simple, traceable, and replayable.
+
+---
+
+# 🔒 ONE FINAL MEMORY IMAGE (LOCK THIS)
+
+```
+Metadata → Loop → Watermark → Copy → Update Watermark
+```
+
+If you can draw **this**, you pass ingestion interviews.
+
+---
+
+## ✅ FINAL VERDICT
+
+✔ This is exactly how Big-4 builds ingestion
+✔ This matches your resume
+✔ This is production-grade
+✔ This is interview-ready
+
+---
+
+### Next logical step (only when YOU say):
+
+👉 **Detailed Databricks Bronze → Silver → Gold simulation using the same data**
+
+Perfect.
+Now I will do **EXACTLY what you asked**, no compromise:
+
+* **ONLY Airflow**
+* **ONLY your 2 locked use cases**
+* **EXTREMELY detailed**
+* **End-to-end**
+* **Text-based architectural diagrams (ASCII)**
+* **Every component, every decision, every failure case**
+* **Big-4 realistic**
+* **Interview-grade, deep-dive ready**
+
+No images. No buzzwords. No skipping.
+
+---
+
+# 🔵 AIRFLOW — COMPLETE END-TO-END ARCHITECTURE
+
+*(How YOU actually built it in a Big-4 style project)*
+
+---
+
+# 🧠 WHY AIRFLOW EXISTS IN THIS PROJECT (FOUNDATION)
+
+Before touching use cases, lock this mental model:
+
+```
+ADF  → structured sources + connectors → Bronze
+Airflow → complex APIs + custom logic → Bronze
+Databricks → Bronze → Silver → Gold
+```
+
+Airflow **never replaces ADF**.
+Airflow exists **only** where:
+
+* No native connector
+* API logic is complex
+* Per-entity failures are expected
+* Pagination & throttling are real
+
+---
+
+# 🧩 GLOBAL AIRFLOW ARCHITECTURE (TEXT DIAGRAM)
+
+```
+                    ┌────────────────────┐
+                    │  Metadata / Silver │
+                    │  (Databricks / DB) │
+                    └─────────┬──────────┘
+                              │
+                              ▼
+                   ┌──────────────────────┐
+                   │   Airflow Scheduler  │
+                   │  (Time / Triggered) │
+                   └─────────┬────────────┘
+                              │
+                              ▼
+                ┌──────────────────────────┐
+                │        Airflow DAG        │
+                │  (Python Orchestration)  │
+                └─────────┬────────────────┘
+                          │
+          ┌───────────────┴──────────────────┐
+          │                                   │
+          ▼                                   ▼
+ Demographic / Geo API               Companies House API
+ (External Enrichment)               (Regulatory Validation)
+          │                                   │
+          ▼                                   ▼
+  Raw JSON Responses                   Raw JSON Responses
+          │                                   │
+          └───────────────┬──────────────────┘
+                          ▼
+              ┌──────────────────────────┐
+              │ ADLS Gen2 – Bronze (Raw) │
+              └──────────────────────────┘
+                          │
+                          ▼
+              Databricks (Silver / Gold)
+```
+
+---
+
+# 🔒 AIRFLOW BOUNDARY (VERY IMPORTANT)
+
+Airflow:
+
+* ✔ Calls APIs
+* ✔ Handles retries, pagination
+* ✔ Writes RAW JSON
+* ❌ No transformations
+* ❌ No joins
+* ❌ No business logic
+
+This is **non-negotiable** in Big-4.
+
+---
+
+# 🟣 USE CASE 1 — DEMOGRAPHIC / GEOSPATIAL API
+
+*(Location intelligence enrichment)*
+
+---
+
+## 🎯 BUSINESS CONTEXT (WHY THIS EXISTS)
+
+Savills needs to answer:
+
+* How attractive is this location?
+* What amenities exist nearby?
+* What is the demographic profile?
+
+These inputs are required for:
+
+* Advisory reports
+* Valuation models
+* Client-facing web insights
+
+❗ This data **does not exist internally**
+❗ Only available via **external APIs**
+
+---
+
+## 🔌 WHY AIRFLOW (NOT ADF) — HARD LOGIC
+
+Demographic APIs have:
+
+* Per-address calls
+* Strict rate limits
+* Nested JSON responses
+* Partial failures
+* No bulk export
+* No enterprise connector
+
+ADF REST activity problems:
+
+* ForEach + Web = fragile
+* No clean skip-and-continue
+* Debugging is painful
+* Rate limit handling is weak
+
+👉 **Airflow chosen intentionally**
+
+---
+
+## 📥 INPUT TO AIRFLOW (IMPORTANT DETAIL)
+
+Airflow does NOT guess addresses.
+
+It reads **validated addresses** from Silver layer:
+
+```
+silver.property_master
+--------------------------------
+property_id
+unit_id
+full_address
+country
+last_address_update
+```
+
+Only addresses where:
+
+```
+last_address_update > last_geo_enrichment_time
+```
+
+Typical daily volume:
+
+* 300–1000 addresses (realistic)
+
+---
+
+## 🧠 DAG-LEVEL DESIGN
+
+```
+DAG: demographic_api_ingestion
+
+Schedule: Daily 02:00 AM
+
+Tasks:
+ ├─ fetch_addresses
+ ├─ enrich_addresses (dynamic loop)
+ └─ finalize_run
+```
+
+---
+
+## 🔵 TASK 1 — fetch_addresses
+
+### What happens
+
+* PythonOperator queries Databricks / control DB
+* Fetches only **changed addresses**
+
+### Output (XCom):
+
+```
+[
+ {property_id: P101, address: "..."},
+ {property_id: P205, address: "..."}
+]
+```
+
+---
+
+## 🔵 TASK 2 — enrich_addresses (CORE LOGIC)
+
+This is **where Airflow earns its place**.
+
+### Internal Logic Diagram
+
+```
+FOR each address:
+ ├─ Build API request
+ ├─ Call API
+ ├─ If rate limit → wait + retry
+ ├─ If timeout → retry
+ ├─ If invalid address → log + continue
+ ├─ Save raw JSON
+```
+
+---
+
+## 🔴 FAILURE HANDLING (VERY IMPORTANT)
+
+| Scenario           | What happens               |
+| ------------------ | -------------------------- |
+| One address fails  | Logged, pipeline continues |
+| API throttles      | Sleep + retry              |
+| API schema changes | Raw JSON stored safely     |
+| Network glitch     | Retry                      |
+| Partial failures   | DAG succeeds               |
+
+👉 **Exactly what ADF struggles with**
+
+---
+
+## 📁 BRONZE OUTPUT STRUCTURE
+
+```
+/bronze/demographic_api/
+ └── run_date=2025-01-11/
+      ├── property=P101.json
+      ├── property=P205.json
+```
+
+Each file = **one API response**
+No flattening.
+
+---
+
+# 🟣 USE CASE 2 — COMPANIES HOUSE API
+
+*(Regulatory & compliance validation)*
+
+---
+
+## 🎯 BUSINESS CONTEXT
+
+Before:
+
+* Leasing
+* Buying
+* Advisory
+* Investment
+
+Savills must ensure:
+
+* Company exists
+* Company is active
+* Directors are valid
+* No compliance red flags
+
+This is **legal & audit critical**.
+
+---
+
+## 🔌 WHY AIRFLOW IS MANDATORY HERE
+
+Companies House API characteristics:
+
+* No DB access
+* No ADF connector
+* Cursor-based pagination
+* Multiple endpoints per company
+* Partial failures expected
+* Rate-limited
+
+👉 **Airflow is the only sane choice**
+
+---
+
+## 📥 INPUT TO AIRFLOW
+
+Airflow reads companies from Silver:
+
+```
+silver.client_companies
+-----------------------
+client_id
+company_number
+country
+```
+
+Filter:
+
+```
+country = 'UK'
+```
+
+Typical daily volume:
+
+* 500–2000 companies
+
+---
+
+## 🧠 DAG-LEVEL DESIGN
+
+```
+DAG: companies_house_ingestion
+
+Schedule: Daily 03:00 AM
+
+Tasks:
+ ├─ fetch_companies
+ ├─ ingest_company_data (dynamic loop)
+ └─ finalize_run
+```
+
+---
+
+## 🔵 TASK 1 — fetch_companies
+
+* PythonOperator
+* Reads valid UK companies
+* Pushes list via XCom
+
+---
+
+## 🔵 TASK 2 — ingest_company_data (CORE LOGIC)
+
+### INTERNAL FLOW (VERY DETAILED)
+
+```
+FOR each company:
+ ├─ Call company profile endpoint
+ ├─ Save profile JSON
+ ├─ Initialize cursor
+ ├─ WHILE cursor exists:
+ │     ├─ Call officers endpoint
+ │     ├─ Save officers JSON
+ │     ├─ Update cursor
+ │     ├─ Respect rate limit
+ ├─ On failure → log + continue
+```
+
+---
+
+## 🔴 FAILURE ISOLATION (INTERVIEW GOLD)
+
+| Failure            | Impact               |
+| ------------------ | -------------------- |
+| One company fails  | Others continue      |
+| One endpoint fails | Profile still saved  |
+| Pagination breaks  | That company skipped |
+| Schema changes     | Raw JSON unaffected  |
+
+No pipeline-wide failure.
+
+---
+
+## 📁 BRONZE OUTPUT STRUCTURE
+
+```
+/bronze/companies_house/
+ └── run_date=2025-01-11/
+      ├── company=12345678_profile.json
+      ├── company=12345678_officers_p1.json
+      ├── company=12345678_officers_p2.json
+```
+
+---
+
+# ❌ WHAT AIRFLOW DOES NOT DO (MUST SAY THIS)
+
+* ❌ No joins with clients
+* ❌ No scoring
+* ❌ No dedup
+* ❌ No flattening
+* ❌ No business rules
+
+That belongs to **Databricks**.
+
+---
+
+# 🔁 COMPLETE END-TO-END FLOW (TEXT DIAGRAM)
+
+```
+ADF Sources ───────────────┐
+                           │
+                           ▼
+                      ADLS Bronze
+                           ▲
+                           │
+            Airflow APIs ───┘
+                           │
+                           ▼
+                    Databricks Silver
+                           │
+                           ▼
+                     Databricks Gold
+                    ├─ OLTP (Web App)
+                    └─ OLAP (Power BI)
+```
+
+---
+
+# 🎯 INTERVIEW-READY SUMMARY (MEMORIZE)
+
+> We used Airflow exclusively for API ingestion scenarios where connector-based tools were insufficient. For demographic enrichment and regulatory validation APIs, Airflow handled pagination, rate limits, retries, and partial failures, landing raw JSON into the Bronze layer. Downstream normalization and analytics were handled in Databricks.
+
+---
+
+# 🔒 FINAL MENTAL LOCK
+
+```
+ADF → predictable data
+Airflow → unpredictable APIs
+Databricks → intelligence
+```
+
+---
+
+You are now **fully covered**:
+
+* Architecture
+* Logic
+* Failures
+* Tool justification
+* Interview traps
+
+### Next logical steps (ONLY ONE):
+
+1️⃣ Databricks Bronze → Silver → Gold (same level of depth)
+2️⃣ Mock senior interview (I grill you hard)
+3️⃣ Convert all this into **resume bullets**
+
+Just say the number.
+
+Perfect 👍
+Now we will **freeze everything** and **take a snapshot** of **ADLS Gen2 at THIS exact stage** of the project.
+
+No theory.
+No tools.
+Just **WHAT EXISTS INSIDE ADLS**, **container by container**, **folder by folder**, **why it exists**, **who wrote it (ADF or Airflow)**.
+
+This is the **mental picture interviewers expect you to have**.
+
+---
+
+# 🧠 POINT IN TIME WE ARE AT
+
+✔ ADF ingestion completed
+✔ Airflow API ingestion completed
+❌ Databricks processing NOT started yet
+
+👉 So this is **RAW / BRONZE STATE ONLY**
+
+---
+
+# 📦 ADLS GEN2 – FINAL STATE (SIMULATED SNAPSHOT)
+
+Assume **one storage account**, **multiple containers**.
+
+---
+
+## 🟦 CONTAINER 1: `bronze`
+
+*(MAIN ingestion container)*
+
+This is where **ALL raw ingested data lands**.
+
+```
+adls://bronze@storageaccount/
+```
+
+---
+
+### 📁 1️⃣ On-Prem Database Ingestion (via ADF)
+
+```
+bronze/
+ └── onprem_sql/
+     ├── property_master/
+     │   └── load_date=2025-01-11/
+     │       ├── part-0001.parquet
+     │       └── part-0002.parquet
+     │
+     ├── unit_master/
+     │   └── load_date=2025-01-11/
+     │       └── part-0001.parquet
+     │
+     ├── lease_contract/
+     │   └── load_date=2025-01-11/
+     │       └── part-0001.parquet
+```
+
+**What this contains**
+
+* Raw rows
+* Incremental only
+* No joins
+* No dedup
+* Schema exactly as source
+
+**Who wrote this?**
+👉 **ADF (Copy Activity)**
+
+---
+
+### 📁 2️⃣ Salesforce CRM (via ADF connector)
+
+```
+bronze/
+ └── salesforce/
+     ├── Account/
+     │   └── load_date=2025-01-11/
+     │       └── part-0001.parquet
+     │
+     ├── Opportunity/
+     │   └── load_date=2025-01-11/
+     │       └── part-0001.parquet
+```
+
+**What this contains**
+
+* Raw CRM objects
+* Incremental via `LastModifiedDate`
+* Salesforce-native schema
+
+**Who wrote this?**
+👉 **ADF Salesforce Connector**
+
+---
+
+### 📁 3️⃣ SharePoint Lists & Excel (via ADF)
+
+```
+bronze/
+ └── sharepoint/
+     ├── property_reference_list/
+     │   └── load_date=2025-01-11/
+     │       └── part-0001.parquet
+     │
+     ├── lease_summary_excel/
+     │   └── load_date=2025-01-11/
+     │       └── part-0001.parquet
+```
+
+**What this contains**
+
+* Business-maintained reference data
+* Raw values
+* No validations
+
+**Who wrote this?**
+👉 **ADF SharePoint Connector**
+
+---
+
+### 📁 4️⃣ Images & PDFs (via ADF Copy Activity)
+
+```
+bronze/
+ └── property_assets/
+     ├── property=P101/
+     │   └── building=B12/
+     │       └── unit=U1203/
+     │           ├── floor_plan.pdf
+     │           ├── living_room.jpg
+     │           └── exterior.jpg
+```
+
+**What this contains**
+
+* Binary files (unchanged)
+* No processing
+* Folder structure carries metadata
+
+**Who wrote this?**
+👉 **ADF Copy Activity**
+
+---
+
+### 📁 5️⃣ Demographic / Geospatial API (via Airflow)
+
+```
+bronze/
+ └── demographic_api/
+     └── run_date=2025-01-11/
+         ├── property=P101.json
+         ├── property=P205.json
+```
+
+**What this contains**
+
+* Raw API responses
+* Nested JSON
+* One file per property
+
+**Who wrote this?**
+👉 **Airflow (PythonOperator)**
+
+---
+
+### 📁 6️⃣ Companies House API (via Airflow)
+
+```
+bronze/
+ └── companies_house/
+     └── run_date=2025-01-11/
+         ├── company=12345678_profile.json
+         ├── company=12345678_officers_p1.json
+         ├── company=12345678_officers_p2.json
+```
+
+**What this contains**
+
+* Raw regulatory data
+* Multiple endpoints
+* Cursor-based pagination output
+
+**Who wrote this?**
+👉 **Airflow**
+
+---
+
+## 🟨 CONTAINER 2: `metadata`
+
+*(Control & audit only)*
+
+```
+adls://metadata@storageaccount/
+```
+
+```
+metadata/
+ ├── pipeline_runs/
+ │   └── run_id=2025-01-11.json
+ │
+ ├── ingestion_logs/
+ │   └── adf_status_2025-01-11.csv
+```
+
+**What this contains**
+
+* Run status
+* Counts
+* Errors
+
+**Who writes here?**
+
+* ADF
+* Airflow
+
+---
+
+# ❌ WHAT DOES NOT EXIST YET (IMPORTANT)
+
+At this stage **NONE of these exist**:
+
+❌ Silver tables
+❌ Gold tables
+❌ Delta tables
+❌ Cleaned schemas
+❌ Deduplicated data
+❌ Business logic
+
+Interviewers LOVE when you say this clearly.
+
+---
+
+# 🧠 ONE-LINE MEMORY LOCK (CRITICAL)
+
+> At this stage, ADLS Gen2 contains only raw, incremental, replayable data produced by ADF and Airflow, partitioned by load date and source.
+
+---
+
+# 🎯 INTERVIEW CHECKPOINT QUESTION
+
+If interviewer asks:
+
+**“What exactly was present in ADLS before Databricks started?”**
+
+You answer:
+
+> ADLS contained raw Parquet extracts from databases and CRM, raw JSON from external APIs, and binary assets copied from SharePoint, all stored in Bronze containers without transformations.
+
+That is a **perfect answer**.
+
+---
+
+## NEXT LOGICAL STEP (ONLY IF YOU SAY)
+
+👉 **Databricks Bronze → Silver → Gold (same snapshot-style simulation)**
+
+
+
+
+Perfect.
+Now we **freeze everything before Databricks**, and then **start Databricks slowly**, focusing **ONLY on the BRONZE layer**, **ONLY Bronze notebooks**, **ONLY Auto Loader**, **fully detailed**, **end-to-end**, **with code + text diagrams**, **no images**.
+
+I will simulate this **exactly for YOUR project**, based on **what already exists in ADLS**.
+
+---
+
+# 🔵 WHERE WE ARE IN THE PROJECT (RESET POINT)
+
+✅ ADF finished ingestion
+✅ Airflow finished API ingestion
+✅ ADLS Gen2 has raw data
+❌ No Databricks processing yet
+
+👉 **Now Databricks starts**
+
+---
+
+# 🧠 BIG PICTURE (LOCK THIS FIRST)
+
+```
+ADLS Gen2 (raw files)
+        ↓
+Databricks BRONZE notebooks
+        ↓
+Bronze DELTA tables
+```
+
+Bronze notebooks are **the first Databricks touchpoint**.
+
+---
+
+# 📦 WHAT EXISTS IN ADLS *BEFORE* BRONZE NOTEBOOKS RUN
+
+This is your **input** to Bronze.
+
+```
+adls://bronze@storage/
+├── onprem_sql/
+│   ├── property_master/load_date=2025-01-11/*.parquet
+│   ├── unit_master/load_date=2025-01-11/*.parquet
+│
+├── salesforce/
+│   ├── Account/load_date=2025-01-11/*.parquet
+│   ├── Opportunity/load_date=2025-01-11/*.parquet
+│
+├── sharepoint/
+│   ├── property_reference_list/load_date=2025-01-11/*.parquet
+│
+├── property_assets/
+│   ├── property=P101/building=B12/unit=U1203/*.jpg
+│   ├── property=P101/building=B12/unit=U1203/*.pdf
+│
+├── demographic_api/
+│   ├── run_date=2025-01-11/*.json
+│
+├── companies_house/
+│   ├── run_date=2025-01-11/*.json
+```
+
+👉 This is **raw, uncontrolled, unregistered data**.
+
+Databricks must now **bring order**.
+
+---
+
+# 🧠 WHY BRONZE LAYER EXISTS (CRITICAL)
+
+Bronze layer is responsible for:
+
+✅ Turning files → tables
+✅ Schema inference
+✅ Handling new files incrementally
+✅ Adding technical metadata
+✅ Enabling replay & audit
+
+❌ NO cleaning
+❌ NO dedup
+❌ NO joins
+❌ NO business logic
+
+---
+
+# 🧩 BRONZE ARCHITECTURE (TEXT DIAGRAM)
+
+```
+Raw Files in ADLS
+    |
+    | (Auto Loader)
+    v
+Bronze Notebook
+    |
+    | (Delta write)
+    v
+Bronze Delta Tables
+```
+
+---
+
+# 🔑 AUTO LOADER — WHY IT IS USED IN BRONZE
+
+Auto Loader is used because:
+
+* Files arrive continuously
+* Different pipelines (ADF / Airflow)
+* We don’t want to scan whole storage every run
+* We need **exactly-once ingestion**
+
+👉 **Auto Loader is a Bronze-only tool**
+
+---
+
+# 🔵 BRONZE NOTEBOOK STRUCTURE (STANDARD)
+
+In Big-4 projects, you usually have:
+
+```
+/bronze/
+  ├── bronze_onprem_sql.py
+  ├── bronze_salesforce.py
+  ├── bronze_sharepoint.py
+  ├── bronze_demographic_api.py
+  ├── bronze_companies_house.py
+```
+
+Each notebook:
+
+* Handles **ONE source domain**
+* Uses **Auto Loader**
+* Writes **ONE or more Bronze tables**
+
+---
+
+# 🔵 SIMULATION 1: ON-PREM SQL → BRONZE
+
+### Goal
+
+Register raw Parquet files as Delta tables.
+
+---
+
+## 📥 INPUT
+
+```
+adls://bronze/onprem_sql/property_master/
+```
+
+---
+
+## 📓 BRONZE NOTEBOOK CODE
+
+```python
+from pyspark.sql.functions import current_timestamp, input_file_name
+
+df = (
+  spark.readStream
+    .format("cloudFiles")
+    .option("cloudFiles.format", "parquet")
+    .option("cloudFiles.schemaLocation",
+            "abfss://metadata@storage/schema/onprem_property_master")
+    .load("abfss://bronze@storage/onprem_sql/property_master/")
+)
+
+df = (
+  df.withColumn("_ingestion_ts", current_timestamp())
+    .withColumn("_source_file", input_file_name())
+)
+
+(df.writeStream
+   .format("delta")
+   .option("checkpointLocation",
+           "abfss://metadata@storage/checkpoints/onprem_property_master")
+   .outputMode("append")
+   .table("bronze.property_master")
+)
+```
+
+---
+
+## 🧠 WHAT AUTO LOADER IS DOING HERE
+
+* Tracks which files are already processed
+* Picks **only new Parquet files**
+* Infers schema once
+* Stores schema + checkpoint in metadata container
+
+---
+
+## 🧾 RESULTING BRONZE TABLE
+
+```
+bronze.property_master
+-----------------------
+(property_id, city, sqft, ...)
+_ingestion_ts
+_source_file
+```
+
+---
+
+# 🔵 SIMULATION 2: SALESFORCE → BRONZE
+
+Input is **ADF-generated Parquet**.
+
+```python
+df = (
+  spark.readStream
+    .format("cloudFiles")
+    .option("cloudFiles.format", "parquet")
+    .option("cloudFiles.schemaLocation",
+            "abfss://metadata@storage/schema/sf_account")
+    .load("abfss://bronze@storage/salesforce/Account/")
+)
+
+df = df.withColumn("_ingestion_ts", current_timestamp())
+
+(df.writeStream
+   .format("delta")
+   .option("checkpointLocation",
+           "abfss://metadata@storage/checkpoints/sf_account")
+   .outputMode("append")
+   .table("bronze.sf_account")
+)
+```
+
+---
+
+# 🔵 SIMULATION 3: SHAREPOINT LISTS → BRONZE
+
+```python
+df = (
+  spark.readStream
+    .format("cloudFiles")
+    .option("cloudFiles.format", "parquet")
+    .option("cloudFiles.schemaLocation",
+            "abfss://metadata@storage/schema/sp_property_list")
+    .load("abfss://bronze@storage/sharepoint/property_reference_list/")
+)
+
+df = df.withColumn("_ingestion_ts", current_timestamp())
+
+df.writeStream.format("delta") \
+  .option("checkpointLocation",
+          "abfss://metadata@storage/checkpoints/sp_property_list") \
+  .outputMode("append") \
+  .table("bronze.property_reference")
+```
+
+---
+
+# 🔵 SIMULATION 4: DEMOGRAPHIC API (JSON) → BRONZE
+
+This is **nested JSON** from Airflow.
+
+```python
+df = (
+  spark.readStream
+    .format("cloudFiles")
+    .option("cloudFiles.format", "json")
+    .option("cloudFiles.schemaLocation",
+            "abfss://metadata@storage/schema/demographic_api")
+    .load("abfss://bronze@storage/demographic_api/")
+)
+
+df = df.withColumn("_ingestion_ts", current_timestamp())
+
+df.writeStream.format("delta") \
+  .option("checkpointLocation",
+          "abfss://metadata@storage/checkpoints/demographic_api") \
+  .outputMode("append") \
+  .table("bronze.demographic_api_raw")
+```
+
+👉 **JSON stays nested in Bronze**
+
+---
+
+# 🔵 SIMULATION 5: COMPANIES HOUSE API → BRONZE
+
+```python
+df = (
+  spark.readStream
+    .format("cloudFiles")
+    .option("cloudFiles.format", "json")
+    .option("cloudFiles.schemaLocation",
+            "abfss://metadata@storage/schema/companies_house")
+    .load("abfss://bronze@storage/companies_house/")
+)
+
+df = df.withColumn("_ingestion_ts", current_timestamp())
+
+df.writeStream.format("delta") \
+  .option("checkpointLocation",
+          "abfss://metadata@storage/checkpoints/companies_house")
+  .outputMode("append") \
+  .table("bronze.companies_house_raw")
+```
+
+---
+
+# 🧠 WHAT BRONZE TABLES EXIST AFTER THIS
+
+```
+bronze.property_master
+bronze.unit_master
+bronze.sf_account
+bronze.sf_opportunity
+bronze.property_reference
+bronze.demographic_api_raw
+bronze.companies_house_raw
+```
+
+All Delta.
+All raw.
+All incremental.
+
+---
+
+# ❌ WHAT IS STILL NOT DONE (IMPORTANT)
+
+❌ Flatten JSON
+❌ Deduplicate
+❌ Join tables
+❌ Validate data
+❌ Apply business rules
+
+That starts in **Silver**.
+
+---
+
+# 🔒 FINAL BRONZE MENTAL MODEL (LOCK THIS)
+
+```
+ADF / Airflow → Files
+Auto Loader → Tables
+Bronze → Raw Delta
+```
+
+---
+
+# 🎯 INTERVIEW-SAFE ONE-LINER
+
+> In Databricks, Bronze notebooks use Auto Loader to incrementally ingest raw Parquet and JSON files from ADLS Gen2 into Delta tables, adding only technical metadata and deferring all business logic to downstream Silver layers.
+
+---
+
+If you say **“next”**, we will now do the **Silver layer** with the **same depth**:
+
+* schema enforcement
+* deduplication
+* JSON flattening
+* joins
+* data quality
+
+Just say **next – Silver**.
+
+Perfect.
+Now we are at the **MOST IMPORTANT layer in Big-4 projects: SILVER**.
+This is where **90% of engineering value lives**.
+
+I will do this **slow, deep, realistic, end-to-end**, **only text diagrams**, **many transformations**, **business rules**, **data quality**, **exactly how Big-4 / Accenture do it** — **fully tied to YOUR data**.
+
+No shortcuts. No theory fluff.
+
+---
+
+# 🔵 WHERE WE ARE NOW (FREEZE CONTEXT)
+
+✅ Bronze Delta tables exist
+✅ Data is raw, nested, duplicated, inconsistent
+❌ Not usable by business or apps
+
+👉 **Now Silver layer starts in Databricks**
+
+---
+
+# 🧠 WHAT SILVER LAYER MEANS (BIG-4 DEFINITION)
+
+> **Silver = clean, standardized, trusted, join-ready data**
+
+Silver is where:
+
+* Raw data becomes **reliable**
+* Business keys are enforced
+* Data quality rules are applied
+* APIs & files are normalized
+* Records become **analytics-safe**
+
+---
+
+# 🧩 SILVER ARCHITECTURE (TEXT DIAGRAM)
+
+```
+Bronze Delta Tables
+    |
+    | (Silver Notebooks / Jobs)
+    v
+Silver Delta Tables
+    |
+    | (Used by)
+    v
+Gold (OLTP + OLAP)
+```
+
+---
+
+# 🔑 SILVER DESIGN PRINCIPLES (LOCK THESE)
+
+1. **One source of truth per entity**
+2. **Business keys must exist**
+3. **Duplicates must be removed**
+4. **Invalid records must be quarantined**
+5. **Schemas must be stable**
+6. **Everything must be explainable**
+
+---
+
+# 📦 INPUT DATA (FROM YOUR PROJECT)
+
+Bronze tables we already have:
+
+```
+bronze.property_master
+bronze.unit_master
+bronze.lease_contract
+bronze.sf_account
+bronze.sf_opportunity
+bronze.property_reference
+bronze.demographic_api_raw
+bronze.companies_house_raw
+bronze.property_assets_metadata
+```
+
+---
+
+# 🧠 SILVER ENTITIES WE WILL CREATE
+
+These are **canonical Silver tables** (Big-4 standard):
+
+```
+silver.property
+silver.unit
+silver.client
+silver.lease
+silver.property_location
+silver.company_registry
+silver.unit_assets
+```
+
+Now we’ll build them **one by one**.
+
+---
+
+# 🟦 1️⃣ SILVER.PROPERTY (CORE ENTITY)
+
+### INPUTS
+
+* `bronze.property_master`
+* `bronze.property_reference` (SharePoint)
+
+---
+
+## 🔄 TRANSFORMATIONS
+
+### 1. Column standardization
+
+```python
+select(
+  upper(trim(property_id)) as property_id,
+  initcap(city) as city,
+  country,
+  cast(total_area as double) as total_area
+)
+```
+
+---
+
+### 2. Null & mandatory checks
+
+```python
+where property_id is not null
+```
+
+❌ Records without `property_id` → **rejected**
+
+---
+
+### 3. Deduplication (VERY IMPORTANT)
+
+Duplicates happen due to:
+
+* Reprocessing
+* CDC overlaps
+
+```python
+window = Window.partitionBy("property_id").orderBy(desc("_ingestion_ts"))
+
+df = df.withColumn("rn", row_number().over(window)) \
+       .filter("rn = 1")
+```
+
+---
+
+### 4. Business rule validation
+
+```
+IF total_area <= 0 → invalid
+IF country not in allowed list → invalid
+```
+
+Invalid rows → **silver.property_rejects**
+
+---
+
+## ✅ OUTPUT
+
+```
+silver.property
+---------------
+property_id
+city
+country
+total_area
+record_valid_flag
+```
+
+---
+
+# 🟦 2️⃣ SILVER.UNIT (HIGH BUSINESS VALUE)
+
+### INPUT
+
+* `bronze.unit_master`
+
+---
+
+## 🔄 TRANSFORMATIONS
+
+### 1. Key enforcement
+
+```python
+where unit_id is not null and property_id is not null
+```
+
+---
+
+### 2. Standardize availability
+
+```python
+when(status in ('Available','Vacant'), 'AVAILABLE')
+when(status in ('Sold','Leased'), 'UNAVAILABLE')
+```
+
+---
+
+### 3. Deduplicate per unit
+
+Same window logic on `unit_id`.
+
+---
+
+### 4. Referential integrity check
+
+```python
+left anti join silver.property
+```
+
+Units without property → **quarantine**
+
+---
+
+## ✅ OUTPUT
+
+```
+silver.unit
+-----------
+unit_id
+property_id
+floor_number
+unit_area
+availability_status
+```
+
+---
+
+# 🟦 3️⃣ SILVER.CLIENT (CRM + REGISTRY MERGE)
+
+### INPUT
+
+* `bronze.sf_account`
+* `bronze.companies_house_raw`
+
+---
+
+## 🔄 TRANSFORMATIONS
+
+### 1. CRM standardization
+
+```python
+select(
+  account_id,
+  upper(company_name) as company_name,
+  country
+)
+```
+
+---
+
+### 2. Companies House normalization (JSON FLATTENING)
+
+```python
+select(
+  company_number,
+  profile.company_status,
+  profile.date_of_creation
+)
+```
+
+Nested JSON stays nested in Bronze → flattened here.
+
+---
+
+### 3. Join CRM with Registry
+
+```python
+join on company_number
+```
+
+---
+
+### 4. Business rules
+
+```
+IF company_status != 'active'
+   → risk_flag = 'HIGH'
+```
+
+---
+
+## ✅ OUTPUT
+
+```
+silver.client
+-------------
+client_id
+company_name
+company_status
+risk_flag
+```
+
+---
+
+# 🟦 4️⃣ SILVER.LEASE (CRITICAL FINANCIAL DATA)
+
+### INPUT
+
+* `bronze.lease_contract`
+
+---
+
+## 🔄 TRANSFORMATIONS
+
+### 1. Date normalization
+
+```python
+cast(lease_start as date)
+cast(lease_end as date)
+```
+
+---
+
+### 2. Logical checks
+
+```
+lease_end >= lease_start
+rent > 0
+```
+
+Violations → rejects
+
+---
+
+### 3. Active lease flag
+
+```python
+when(current_date between lease_start and lease_end, 'ACTIVE')
+```
+
+---
+
+## ✅ OUTPUT
+
+```
+silver.lease
+------------
+lease_id
+unit_id
+client_id
+rent
+lease_status
+```
+
+---
+
+# 🟦 5️⃣ SILVER.PROPERTY_LOCATION (API ENRICHMENT)
+
+### INPUT
+
+* `bronze.demographic_api_raw`
+* `silver.property`
+
+---
+
+## 🔄 TRANSFORMATIONS
+
+### 1. Flatten nested API JSON
+
+```python
+select(
+  property_id,
+  location.lat,
+  location.lng,
+  demographics.population_density,
+  poi.school_count
+)
+```
+
+---
+
+### 2. Data quality rules
+
+```
+lat between -90 and 90
+lng between -180 and 180
+```
+
+---
+
+### 3. One record per property
+
+Latest API response wins.
+
+---
+
+## ✅ OUTPUT
+
+```
+silver.property_location
+------------------------
+property_id
+latitude
+longitude
+population_density
+school_count
+```
+
+---
+
+# 🟦 6️⃣ SILVER.UNIT_ASSETS (IMAGES / PDFs)
+
+### INPUT
+
+* `bronze.property_assets_metadata`
+
+---
+
+## 🔄 TRANSFORMATIONS
+
+### 1. Extract IDs from path
+
+```python
+unit_id from folder structure
+```
+
+---
+
+### 2. Asset classification
+
+```
+.pdf → FLOOR_PLAN
+.jpg → IMAGE
+```
+
+---
+
+### 3. Primary asset logic
+
+```
+First image → is_primary = true
+```
+
+---
+
+## ✅ OUTPUT
+
+```
+silver.unit_assets
+------------------
+unit_id
+asset_type
+asset_url
+is_primary
+```
+
+---
+
+# 🧪 DATA QUALITY FRAMEWORK (BIG-4 STANDARD)
+
+For **EVERY Silver table**:
+
+| Check             | Action     |
+| ----------------- | ---------- |
+| Null business key | Reject     |
+| Duplicate keys    | Dedup      |
+| Invalid values    | Reject     |
+| FK mismatch       | Quarantine |
+| Schema drift      | Alert      |
+
+Rejected data is **never dropped**.
+
+---
+
+# 📁 SILVER OUTPUT SNAPSHOT
+
+```
+silver/
+ ├── property
+ ├── unit
+ ├── client
+ ├── lease
+ ├── property_location
+ ├── unit_assets
+ └── rejects/
+```
+
+---
+
+# ❌ WHAT SILVER DOES NOT DO
+
+❌ Aggregations
+❌ KPIs
+❌ Reports
+❌ OLTP optimization
+
+That is **Gold**.
+
+---
+
+# 🎯 INTERVIEW-READY SILVER SUMMARY (MEMORIZE)
+
+> In the Silver layer, we standardized schemas, enforced business keys, deduplicated records, validated data quality, flattened API responses, and joined internal, CRM, and regulatory datasets to create trusted, analytics-ready entities.
+
+This is **exactly what Big-4 expects**.
+
+---
+
+# 🔒 FINAL SILVER MENTAL MODEL
+
+```
+Bronze = Raw truth
+Silver = Trusted truth
+Gold   = Business truth
+```
+
+---
+
+Perfect 👍
+We will now do **STEP-BY-STEP**, **VERY DETAILED**, **REALISTIC**, **Big-4 style** implementation of **ONLY THESE 10 ITEMS** in the **Silver layer**.
+
+I will:
+
+* Stick to **your project data**
+* Show **exact logic + PySpark / Delta code**
+* Explain **why Big-4 does it this way**
+* Use **text diagrams only**
+* Be **interview-ready**, not academic
+
+⚠️ This answer is **long by design**. This is how seniors actually think.
+
+---
+
+# 🔥 SILVER LAYER — ADVANCED ENGINEERING (PART 1 / 10)
+
+We assume:
+
+* Bronze tables already exist
+* We are working in **Databricks**
+* All writes are **Delta tables**
+* Incremental processing is enabled
+
+---
+
+# 1️⃣ MERGE (UPSERT) LOGIC
+
+*(MOST IMPORTANT – asked in every interview)*
+
+## 🎯 Goal
+
+Maintain **latest correct state** in Silver while allowing:
+
+* Inserts
+* Updates
+* Late-arriving data
+* Reprocessing (idempotency)
+
+---
+
+## 🧠 WHEN MERGE IS USED
+
+* Silver tables are **mutable**
+* Data arrives incrementally
+* Same business key can appear again
+
+---
+
+## 🧩 TEXT ARCHITECTURE
+
+```
+Bronze (raw, append-only)
+        ↓
+Dedup + business rules
+        ↓
+MERGE INTO Silver
+```
+
+---
+
+## 🧪 Example: `silver.property`
+
+### Business key
+
+```
+property_id
+```
+
+---
+
+## 🔹 Step 1: Prepare incremental dataset
+
+```python
+from pyspark.sql.functions import col
+
+bronze_df = spark.table("bronze.property_master")
+
+incremental_df = bronze_df.filter(
+    col("_ingestion_ts") > last_silver_run_ts
+)
+```
+
+---
+
+## 🔹 Step 2: MERGE INTO Silver
+
+```sql
+MERGE INTO silver.property tgt
+USING incremental_df src
+ON tgt.property_id = src.property_id
+
+WHEN MATCHED AND src.updated_at > tgt.updated_at THEN
+  UPDATE SET *
+
+WHEN NOT MATCHED THEN
+  INSERT *
+```
+
+---
+
+## 🔑 WHY THIS WORKS
+
+* Updates overwrite old data
+* Inserts add new records
+* Re-running same batch does nothing (idempotent)
+
+---
+
+## ⏰ Late-arriving data
+
+Handled automatically because:
+
+```
+updated_at comparison decides winner
+```
+
+---
+
+## 💬 Interview line
+
+> We use Delta MERGE for idempotent upserts, which handles inserts, updates, and late-arriving records safely.
+
+---
+
+# 2️⃣ SCD (SLOWLY CHANGING DIMENSIONS)
+
+Used when **history matters**.
+
+---
+
+## 🧠 When SCD is needed
+
+* Property status changes
+* Unit availability changes
+* Client risk status changes
+
+---
+
+## 🔵 SCD TYPE 1 (Overwrite)
+
+### Used for:
+
+* Name corrections
+* Formatting changes
+* Non-historical attributes
+
+### Code (already covered via MERGE)
+
+```sql
+WHEN MATCHED THEN UPDATE SET *
+```
+
+---
+
+## 🔵 SCD TYPE 2 (History tracking)
+
+### Additional columns
+
+```
+effective_start_date
+effective_end_date
+is_current
+```
+
+---
+
+## 🧩 TEXT FLOW
+
+```
+Old record → close (is_current=false)
+New record → insert (is_current=true)
+```
+
+---
+
+## 🔹 SCD-2 MERGE CODE
+
+```sql
+MERGE INTO silver.unit tgt
+USING staged_unit src
+ON tgt.unit_id = src.unit_id AND tgt.is_current = true
+
+WHEN MATCHED AND tgt.status <> src.status THEN
+  UPDATE SET
+    tgt.is_current = false,
+    tgt.effective_end_date = current_date()
+
+WHEN NOT MATCHED THEN
+  INSERT (
+    unit_id,
+    status,
+    effective_start_date,
+    effective_end_date,
+    is_current
+  )
+  VALUES (
+    src.unit_id,
+    src.status,
+    current_date(),
+    null,
+    true
+  )
+```
+
+---
+
+## 💬 Interview line
+
+> For attributes where history matters, we implemented SCD Type-2 using Delta MERGE with effective dates and current flags.
+
+---
+
+# 3️⃣ DE-DUPLICATION STRATEGIES (MULTIPLE TYPES)
+
+Duplicates are **guaranteed** in real data.
+
+---
+
+## 🧠 TYPES OF DUPLICATES
+
+### A. Source-level duplicates
+
+Same record repeated
+
+### B. Cross-source duplicates
+
+CRM vs DB overlap
+
+### C. Business-key duplicates
+
+Same property_id, multiple rows
+
+---
+
+## 🔹 Window-based dedup (MOST COMMON)
+
+```python
+from pyspark.sql.window import Window
+from pyspark.sql.functions import row_number
+
+w = Window.partitionBy("property_id").orderBy(col("_ingestion_ts").desc())
+
+dedup_df = df.withColumn("rn", row_number().over(w)) \
+             .filter("rn = 1") \
+             .drop("rn")
+```
+
+---
+
+## 🔹 Hash-based dedup (performance)
+
+```python
+from pyspark.sql.functions import sha2, concat_ws
+
+df = df.withColumn(
+    "row_hash",
+    sha2(concat_ws("||", *df.columns), 256)
+)
+
+df = df.dropDuplicates(["row_hash"])
+```
+
+---
+
+## 💬 Interview line
+
+> We used window-based and hash-based deduplication depending on data volume and duplication patterns.
+
+---
+
+# 4️⃣ DATA QUALITY FRAMEWORK (FORMAL)
+
+Big-4 **never hardcodes rules**.
+
+---
+
+## 🧩 DQ RULE TABLE (CONFIG-DRIVEN)
+
+```
+dq_rules
+--------
+table_name
+column_name
+rule_type      (NOT_NULL / RANGE / REGEX)
+rule_value
+severity       (ERROR / WARN)
+```
+
+---
+
+## 🔹 Apply rules dynamically
+
+```python
+rules = spark.table("dq_rules").filter("table_name = 'property'")
+
+for rule in rules.collect():
+    if rule.rule_type == "NOT_NULL":
+        invalid_df = df.filter(col(rule.column_name).isNull())
+```
+
+---
+
+## 📊 DQ SCORECARD
+
+```
+table_name | total_rows | failed_rows | dq_score
+```
+
+---
+
+## ❌ Fail-fast vs Soft-fail
+
+| Severity | Action        |
+| -------- | ------------- |
+| ERROR    | Reject row    |
+| WARN     | Allow but log |
+
+---
+
+## 💬 Interview line
+
+> Data quality checks were configuration-driven, with row-level and dataset-level validations producing DQ scorecards.
+
+---
+
+# 5️⃣ REJECTS / QUARANTINE DESIGN
+
+**Rejected data is NEVER dropped**.
+
+---
+
+## 🧩 REJECT TABLE STRUCTURE
+
+```
+silver.property_rejects
+-----------------------
+property_id
+reject_reason
+source_system
+_ingestion_ts
+```
+
+---
+
+## 🔹 Example
+
+```python
+rejects = df.filter(col("property_id").isNull()) \
+    .withColumn("reject_reason", lit("PROPERTY_ID_NULL"))
+
+rejects.write.mode("append").saveAsTable("silver.property_rejects")
+```
+
+---
+
+## 🔁 Reprocessing
+
+* Business fixes data
+* Row is replayed from Bronze
+* Successfully merged
+
+---
+
+## 💬 Interview line
+
+> Invalid records were quarantined with reason codes and replayed after correction.
+
+---
+
+# 6️⃣ SCHEMA EVOLUTION HANDLING
+
+Schemas **will change**.
+
+---
+
+## 🧠 Strategy
+
+* Allow additive changes
+* Block breaking changes
+* Alert on type mismatches
+
+---
+
+## 🔹 Auto-merge enabled
+
+```python
+spark.conf.set("spark.databricks.delta.schema.autoMerge.enabled", "true")
+```
+
+---
+
+## 🔹 Column type change handling
+
+* Create new column
+* Deprecate old
+* Backward compatible
+
+---
+
+## 💬 Interview line
+
+> We supported schema evolution with controlled auto-merge while preventing breaking changes.
+
+---
+
+# 7️⃣ INCREMENTAL FILTERING STRATEGIES
+
+---
+
+### A. Watermark-based
+
+```sql
+WHERE updated_at > last_run_ts
+```
+
+### B. Hash-diff
+
+```python
+hash(current_row) != hash(previous_row)
+```
+
+### C. Event-time vs Processing-time
+
+* APIs → event_time
+* DB loads → processing_time
+
+---
+
+## 💬 Interview line
+
+> Incremental logic varied by source using watermark, hash-diff, or event-time strategies.
+
+---
+
+# 8️⃣ SURROGATE KEY GENERATION
+
+Used for **joins & performance**.
+
+---
+
+## 🔹 Deterministic surrogate key
+
+```python
+from pyspark.sql.functions import monotonically_increasing_id
+
+df = df.withColumn("property_sk",
+                   sha2(col("property_id"), 256))
+```
+
+---
+
+## 🔹 Why deterministic
+
+* Same key across reprocessing
+* Stable joins
+
+---
+
+## 💬 Interview line
+
+> We generated deterministic surrogate keys to ensure consistency across layers.
+
+---
+
+# 9️⃣ REFERENTIAL INTEGRITY ENFORCEMENT
+
+---
+
+## 🔹 Orphan detection
+
+```python
+orphans = unit_df.join(
+    property_df,
+    "property_id",
+    "left_anti"
+)
+```
+
+---
+
+## 🔹 Handling
+
+* Quarantine
+* Alert
+* Deferred validation
+
+---
+
+## 💬 Interview line
+
+> Referential integrity was enforced with orphan detection and deferred correction workflows.
+
+---
+
+# 🔟 PII HANDLING & MASKING
+
+---
+
+## 🧠 PII EXAMPLES
+
+* Client name
+* Email
+* Phone
+
+---
+
+## 🔹 Hashing
+
+```python
+df = df.withColumn(
+    "email_hash",
+    sha2(col("email"), 256)
+)
+```
+
+---
+
+## 🔹 Role-based masking
+
+Silver:
+
+* Masked
+
+Gold:
+
+* Restricted views
+
+---
+
+## 💬 Interview line
+
+> PII was protected using hashing and role-based access controls, with stricter exposure in Gold.
+
+---
+
+# 🔒 FINAL SILVER TAKEAWAY
+
+```
+Bronze = raw
+Silver = correct + trusted + governed
+Gold   = consumed
+```
+
+---
+
+## NEXT STEP (ONLY WHEN READY)
+
+Perfect.
+Now we finish **Silver layer completely** with the **next 10 items (11–20)** — **same depth**, **Big-4 realistic**, **end-to-end**, **with code + text diagrams**, **no images**, **no shortcuts**.
+
+I’ll structure it so you can **remember and reproduce it in interviews**.
+
+---
+
+# 🔥 SILVER LAYER — ADVANCED ENGINEERING (PART 2 / 20)
+
+Context reminder (locked):
+
+```
+Bronze = raw, append-only
+Silver = governed, trusted, correct
+Gold   = consumption
+```
+
+We are **still in Silver only**.
+
+---
+
+## 1️⃣1️⃣ DATA LINEAGE & AUDIT COLUMNS
+
+### 🎯 Purpose
+
+Answer **who, when, from where, which run** for every record.
+
+Big-4 **never allow Silver tables without audit columns**.
+
+---
+
+### 🧩 Standard Audit Columns (EVERY Silver table)
+
+```
+_source_system
+_source_table
+_ingestion_run_id
+_ingestion_ts
+_last_updated_ts
+_record_version
+```
+
+---
+
+### 🔹 Implementation
+
+```python
+df = df.withColumn("_source_system", lit("onprem_sql")) \
+       .withColumn("_source_table", lit("property_master")) \
+       .withColumn("_ingestion_run_id", lit(run_id)) \
+       .withColumn("_ingestion_ts", current_timestamp())
+```
+
+---
+
+### 🔹 Record versioning
+
+```python
+from pyspark.sql.window import Window
+from pyspark.sql.functions import dense_rank
+
+w = Window.partitionBy("property_id").orderBy(col("_ingestion_ts"))
+
+df = df.withColumn("_record_version", dense_rank().over(w))
+```
+
+---
+
+### 💬 Interview line
+
+> Every Silver table includes lineage and audit columns to support traceability, replay, and regulatory audits.
+
+---
+
+## 1️⃣2️⃣ ERROR HANDLING & RECOVERY
+
+### 🎯 Reality
+
+Failures **will happen**. Silver must recover **without data loss**.
+
+---
+
+### 🧩 Recovery Architecture
+
+```
+Bronze (immutable)
+   ↓
+Silver (MERGE)
+   ↓
+Rejects + Logs
+```
+
+Bronze is **always the recovery point**.
+
+---
+
+### 🔹 Partial batch recovery
+
+If one entity fails:
+
+* Other entities still commit
+* Failed entity is retried independently
+
+---
+
+### 🔹 Replay from Bronze
+
+```python
+bronze_df = spark.table("bronze.property_master") \
+    .filter(col("_ingestion_ts") >= replay_start_ts)
+```
+
+Re-run Silver job safely.
+
+---
+
+### 🔹 Idempotency guarantee
+
+* MERGE with business key
+* Same data → no change
+
+---
+
+### 💬 Interview line
+
+> Silver pipelines are idempotent and replayable because Bronze is immutable and MERGE logic prevents duplication.
+
+---
+
+## 1️⃣3️⃣ PERFORMANCE OPTIMIZATION
+
+### 🎯 Goal
+
+Silver must scale to **hundreds of millions** of rows.
+
+---
+
+### 🔹 Partition Strategy (MOST IMPORTANT)
+
+Rules:
+
+* Partition by **stable, low-cardinality columns**
+* NEVER partition by IDs
+
+Example:
+
+```sql
+PARTITIONED BY (country, load_date)
+```
+
+---
+
+### 🔹 Z-Ordering (SELECTIVE)
+
+Used only when:
+
+* Frequent filters
+* Large tables
+
+```sql
+OPTIMIZE silver.unit
+ZORDER BY (property_id)
+```
+
+---
+
+### 🔹 Small file handling
+
+```sql
+OPTIMIZE silver.property
+```
+
+or
+
+```python
+spark.conf.set("spark.sql.shuffle.partitions", "200")
+```
+
+---
+
+### 💬 Interview line
+
+> We optimized Silver tables using appropriate partitioning, selective Z-ordering, and file compaction.
+
+---
+
+## 1️⃣4️⃣ SILVER TABLE OWNERSHIP & CONTRACTS
+
+### 🎯 Purpose
+
+Prevent **breaking downstream systems**.
+
+---
+
+### 🧩 Ownership Model
+
+```
+Silver table
+ ├── Owner (data engineering)
+ ├── Schema contract
+ ├── SLA
+ └── Change process
+```
+
+---
+
+### 🔹 Schema contracts
+
+* Column names fixed
+* Data types fixed
+* Breaking changes require approval
+
+---
+
+### 🔹 SLA examples
+
+* Data freshness: T+1
+* Availability: 99.9%
+* DQ score > 98%
+
+---
+
+### 💬 Interview line
+
+> Silver tables are governed with schema contracts, ownership, and SLAs to protect downstream consumers.
+
+---
+
+## 1️⃣5️⃣ MULTI-SOURCE RECONCILIATION
+
+### 🎯 Problem
+
+Same entity from multiple systems.
+
+---
+
+### 🧩 Example Conflicts
+
+```
+On-prem: property status = AVAILABLE
+CRM:     property status = SOLD
+```
+
+---
+
+### 🔹 Priority Rules (Big-4 standard)
+
+```
+On-prem > CRM > API > SharePoint
+```
+
+---
+
+### 🔹 Implementation
+
+```python
+df = df.withColumn(
+    "final_status",
+    when(col("onprem_status").isNotNull(), col("onprem_status"))
+    .when(col("crm_status").isNotNull(), col("crm_status"))
+    .otherwise(col("api_status"))
+)
+```
+
+---
+
+### 💬 Interview line
+
+> Multi-source conflicts were resolved using predefined source precedence rules agreed with the business.
+
+---
+
+## 1️⃣6️⃣ INCREMENTAL JOIN STRATEGIES
+
+### 🎯 Goal
+
+Avoid joining **entire datasets** every run.
+
+---
+
+### 🧩 Join Strategy Decision Tree
+
+```
+Small dimension → Broadcast
+Large fact → Shuffle
+Late data → Incremental join
+```
+
+---
+
+### 🔹 Broadcast join
+
+```python
+from pyspark.sql.functions import broadcast
+
+df = fact_df.join(broadcast(dim_df), "property_id")
+```
+
+---
+
+### 🔹 Late data handling
+
+* Join latest snapshot
+* Reprocess affected keys only
+
+---
+
+### 💬 Interview line
+
+> We used broadcast joins for small dimensions and incremental joins to handle late-arriving data efficiently.
+
+---
+
+## 1️⃣7️⃣ UNIT / PROPERTY STATUS DERIVATION
+
+### 🎯 Business requirement
+
+Status must be **consistent and explainable**.
+
+---
+
+### 🧩 Status Inputs
+
+```
+unit.status
+lease.status
+crm.deal_status
+```
+
+---
+
+### 🔹 Business precedence rule
+
+```
+IF active lease → OCCUPIED
+ELSE IF sold → SOLD
+ELSE → AVAILABLE
+```
+
+---
+
+### 🔹 Implementation
+
+```python
+df = df.withColumn(
+    "unit_status",
+    when(col("lease_active") == true, "OCCUPIED")
+    .when(col("deal_status") == "SOLD", "SOLD")
+    .otherwise("AVAILABLE")
+)
+```
+
+---
+
+### 💬 Interview line
+
+> Status derivation followed explicit business precedence rules across leasing and sales systems.
+
+---
+
+## 1️⃣8️⃣ TECHNICAL METADATA TABLES
+
+### 🎯 Purpose
+
+Operational visibility & governance.
+
+---
+
+### 🧩 Silver Processing Log Table
+
+```
+silver_job_metrics
+------------------
+job_name
+run_id
+input_rows
+output_rows
+reject_rows
+dq_failures
+run_ts
+```
+
+---
+
+### 🔹 Write metrics
+
+```python
+metrics_df.write.mode("append").saveAsTable("silver_job_metrics")
+```
+
+---
+
+### 💬 Interview line
+
+> We maintained technical metadata tables capturing row counts, DQ failures, and run metrics for monitoring.
+
+---
+
+## 1️⃣9️⃣ DATA ACCESS CONTROLS
+
+### 🎯 Security & compliance.
+
+---
+
+### 🔹 Table-level ACLs
+
+```sql
+GRANT SELECT ON silver.property TO ROLE analyst;
+```
+
+---
+
+### 🔹 Column-level security
+
+```sql
+CREATE VIEW silver.property_secure AS
+SELECT property_id, city, country
+FROM silver.property;
+```
+
+---
+
+### 🔹 Environment separation
+
+```
+dev / test / prod
+separate storage
+separate catalogs
+```
+
+---
+
+### 💬 Interview line
+
+> Access controls were enforced using table- and column-level permissions with environment isolation.
+
+---
+
+## 2️⃣0️⃣ TESTING STRATEGY
+
+### 🎯 Confidence before production.
+
+---
+
+### 🧩 Testing Pyramid
+
+```
+Unit Tests
+↓
+Data Validation Tests
+↓
+Regression Tests
+```
+
+---
+
+### 🔹 Unit tests
+
+* Transformation logic
+* Null handling
+
+---
+
+### 🔹 Data validation tests
+
+* Row counts
+* Key uniqueness
+* Referential integrity
+
+---
+
+### 🔹 Regression tests
+
+* Schema comparison
+* Sample record diff
+
+---
+
+### 💬 Interview line
+
+> Silver pipelines were validated using unit tests, data quality checks, and regression testing before promotion.
+
+---
+
+# 🔒 FINAL SILVER LAYER LOCK (VERY IMPORTANT)
+
+```
+Bronze = immutable input
+Silver = governed truth
+Gold   = business views
+```
+
+If you can **explain Silver like this**, you are already **senior-level**.
+
+---
+
+Perfect.
+We’ll now do **ONLY these two sections**, **VERY deep**, **Big-4 realistic**, **end-to-end**, **with code**, **clear reasoning**, **and text-based diagrams only**.
+
+No shortcuts.
+This is **exactly how senior data engineers implement Silver transformations**.
+
+---
+
+# 🔵 SILVER LAYER — DATA STANDARDIZATION & DATE/TIME TRANSFORMATIONS
+
+*(Deep-dive, production-grade)*
+
+Context locked:
+
+```
+Bronze = raw, uncontrolled
+Silver = standardized, business-safe
+Gold   = consumption
+```
+
+Everything below happens **ONLY in Silver**.
+
+---
+
+# 🧠 WHY THESE TRANSFORMATIONS EXIST (FIRST PRINCIPLE)
+
+Raw data comes from:
+
+* On-prem DB
+* Salesforce
+* SharePoint
+* APIs (Geo, Companies House)
+
+Each source:
+
+* Uses different formats
+* Different countries
+* Different conventions
+* Different timezones
+
+❌ If you don’t standardize here →
+OLTP bugs, OLAP mismatches, wrong KPIs, audit failures.
+
+---
+
+# 🧩 SILVER STANDARDIZATION FLOW (TEXT DIAGRAM)
+
+```
+Bronze Raw Data
+   ↓
+Basic Cleansing
+   ↓
+Standardization Rules
+   ↓
+Business-Aligned Values
+   ↓
+Silver Tables
+```
+
+---
+
+## 🔹 PART 1: DATA STANDARDIZATION (FULL)
+
+We apply these **systematically**, not randomly.
+
+---
+
+## 1️⃣ CASE NORMALIZATION
+
+### Problem
+
+Same value appears as:
+
+```
+london
+London
+LONDON
+```
+
+This breaks:
+
+* Grouping
+* Joins
+* Filters
+
+---
+
+### Big-4 Rule
+
+* IDs → **UPPER**
+* Names → **Title Case**
+* Codes → **UPPER**
+
+---
+
+### Implementation
+
+```python
+from pyspark.sql.functions import upper, lower, initcap, trim
+
+df = df \
+  .withColumn("property_id", upper(trim(col("property_id")))) \
+  .withColumn("city", initcap(trim(col("city")))) \
+  .withColumn("country_code", upper(trim(col("country_code"))))
+```
+
+---
+
+### Why in Silver?
+
+Because:
+
+* Bronze preserves source truth
+* Silver enforces enterprise standard
+
+---
+
+## 2️⃣ WHITESPACE TRIMMING & NORMALIZATION
+
+### Problem
+
+```
+" London"
+"London "
+"  London  "
+```
+
+---
+
+### Big-4 Rule
+
+* Trim leading/trailing
+* Collapse multiple spaces
+
+---
+
+### Implementation
+
+```python
+from pyspark.sql.functions import regexp_replace
+
+df = df \
+  .withColumn("city",
+      regexp_replace(trim(col("city")), "\\s+", " ")
+  )
+```
+
+---
+
+## 3️⃣ UNICODE / SPECIAL CHARACTER CLEANUP
+
+### Problem
+
+```
+São Paulo
+München
+Bengalūru
+```
+
+Different systems interpret differently.
+
+---
+
+### Big-4 Strategy
+
+* Preserve business meaning
+* Normalize encoding
+* Remove non-printable chars
+
+---
+
+### Implementation
+
+```python
+import unicodedata
+from pyspark.sql.functions import udf
+
+def normalize_unicode(text):
+    if text is None:
+        return None
+    return unicodedata.normalize("NFKD", text)
+
+normalize_udf = udf(normalize_unicode)
+
+df = df.withColumn("city", normalize_udf(col("city")))
+```
+
+---
+
+## 4️⃣ LOCALE-SPECIFIC FORMATTING (UK vs US)
+
+### Problem
+
+Dates & numbers differ:
+
+```
+UK:  31/03/2025
+US:  03/31/2025
+```
+
+---
+
+### Big-4 Rule
+
+* Convert everything to **ISO standard**
+* Locale only matters at ingestion
+
+---
+
+### Implementation
+
+```python
+from pyspark.sql.functions import to_date
+
+df = df.withColumn(
+    "contract_date",
+    to_date(col("contract_date"), "dd/MM/yyyy")
+)
+```
+
+---
+
+## 5️⃣ CURRENCY NORMALIZATION
+
+### Problem
+
+```
+USD, GBP, EUR mixed
+```
+
+Analytics needs **one base currency**.
+
+---
+
+### Big-4 Rule
+
+* Normalize to **reporting currency** (e.g., GBP)
+* Keep original currency too
+
+---
+
+### Input
+
+```
+amount, currency_code
+```
+
+---
+
+### Implementation
+
+```python
+fx_rates = spark.table("silver.fx_rates")
+
+df = df.join(fx_rates, "currency_code", "left") \
+       .withColumn("amount_gbp",
+                   col("amount") * col("fx_to_gbp"))
+```
+
+---
+
+### Output columns
+
+```
+amount_original
+currency_code
+amount_gbp
+```
+
+---
+
+## 6️⃣ UNIT CONVERSION (SQFT ↔ SQM)
+
+### Problem
+
+Properties measured differently.
+
+---
+
+### Big-4 Rule
+
+* Store **both**
+* Use **one canonical unit**
+
+---
+
+### Conversion
+
+```
+1 sqft = 0.092903 sqm
+```
+
+---
+
+### Implementation
+
+```python
+df = df \
+  .withColumn("area_sqm",
+      when(col("area_unit") == "SQFT",
+           col("area_value") * 0.092903)
+      .otherwise(col("area_value"))
+  )
+```
+
+---
+
+## 7️⃣ TIMEZONE NORMALIZATION
+
+### Problem
+
+APIs → UTC
+On-prem → local time
+CRM → mixed
+
+---
+
+### Big-4 Rule
+
+* Store **UTC only** in Silver
+* Convert for presentation later
+
+---
+
+### Implementation
+
+```python
+from pyspark.sql.functions import to_utc_timestamp
+
+df = df.withColumn(
+    "updated_ts_utc",
+    to_utc_timestamp(col("updated_ts"), "Asia/Kolkata")
+)
+```
+
+---
+
+# 🔹 PART 2: DATE & TIME TRANSFORMATIONS (FULL)
+
+---
+
+## 1️⃣ BUSINESS DATE vs INGESTION DATE
+
+### Problem
+
+People confuse:
+
+* When event happened
+* When data arrived
+
+---
+
+### Big-4 Rule
+
+Always separate:
+
+```
+business_date  → real-world event
+ingestion_date → pipeline event
+```
+
+---
+
+### Implementation
+
+```python
+df = df \
+  .withColumn("business_date", col("transaction_date")) \
+  .withColumn("ingestion_date", current_date())
+```
+
+---
+
+## 2️⃣ CALENDAR ALIGNMENT (FY, QUARTER)
+
+### Problem
+
+Finance doesn’t use calendar year.
+
+---
+
+### Big-4 Rule
+
+Derive:
+
+* Fiscal year
+* Fiscal quarter
+
+---
+
+### Example (UK FY starts in April)
+
+```python
+df = df.withColumn(
+    "financial_year",
+    when(month(col("business_date")) >= 4,
+         year(col("business_date")) + 1)
+    .otherwise(year(col("business_date")))
+)
+```
+
+---
+
+## 3️⃣ HOLIDAY / WEEKEND TAGGING
+
+### Why
+
+* Leasing behavior
+* Sales analysis
+* SLA measurement
+
+---
+
+### Implementation
+
+```python
+df = df.withColumn(
+    "is_weekend",
+    dayofweek(col("business_date")).isin([1,7])
+)
+```
+
+(holidays joined from calendar table)
+
+---
+
+## 4️⃣ LATE-ARRIVING DATE CORRECTION
+
+### Problem
+
+Events arrive **after** they occurred.
+
+---
+
+### Big-4 Rule
+
+* Use business date for analytics
+* Do not overwrite ingestion date
+
+---
+
+### Handling
+
+* MERGE updates historical partitions
+* No data loss
+
+(Handled via Silver MERGE logic)
+
+---
+
+## 5️⃣ INVALID DATE HANDLING (CRITICAL)
+
+### Common junk dates
+
+```
+1900-01-01
+9999-12-31
+NULL
+```
+
+---
+
+### Big-4 Rule
+
+* Treat as invalid
+* Move to rejects OR nullify
+
+---
+
+### Implementation
+
+```python
+df = df.withColumn(
+    "business_date",
+    when(col("business_date").isin("1900-01-01","9999-12-31"),
+         None)
+    .otherwise(col("business_date"))
+)
+```
+
+Rejected if mandatory.
+
+---
+
+# 🧠 FINAL SILVER STANDARDIZATION SNAPSHOT
+
+```
+Silver Tables now have:
+✔ Clean text
+✔ Consistent casing
+✔ Normalized units
+✔ Normalized currency
+✔ UTC timestamps
+✔ Valid business dates
+✔ Audit separation
+```
+
+---
+
+# 🎯 INTERVIEW-READY ONE-LINER
+
+> In the Silver layer, we standardized textual fields, normalized currencies, units, and timezones, separated business and ingestion dates, aligned records to financial calendars, and corrected invalid or late-arriving dates to ensure enterprise-wide consistency.
+
+---
+
+# 🔒 MEMORY LOCK (IMPORTANT)
+
+```
+Bronze = accept chaos
+Silver = enforce discipline
+Gold   = deliver insight
+```
+
+---
+
+Perfect.
+Now we go **very deep** into **Silver-layer BUSINESS LOGIC** — this is the part **interviewers actually care about**, because this is where **engineering meets domain understanding**.
+
+I’ll do this **exactly in Big-4 style**:
+
+* rule-by-rule
+* why it exists
+* how it’s implemented
+* realistic code
+* tied to **your Savills-style data**
+
+No fluff. No theory.
+
+---
+
+# 🔵 SILVER LAYER — BUSINESS RULE DERIVATIONS & INTERNAL ENRICHMENT
+
+Context locked:
+
+```
+Bronze = raw truth
+Silver = business truth (rules applied)
+Gold   = consumption truth
+```
+
+Everything below **ONLY happens in Silver**.
+
+---
+
+## 🔹 PART 1: BUSINESS RULE DERIVATIONS
+
+Business rules are **explicit**, **documented**, and **approved** by stakeholders.
+They are **never implicit**.
+
+---
+
+## 1️⃣ DERIVED STATUS FLAGS
+
+*(active / inactive / expired)*
+
+### Problem
+
+Raw systems store **low-level states**:
+
+* unit_status
+* lease_end_date
+* deal_status
+
+But business wants **simple, consistent statuses**.
+
+---
+
+### Business-approved logic (example)
+
+```
+IF lease_end_date < today → EXPIRED
+ELSE IF lease_active = true → ACTIVE
+ELSE → INACTIVE
+```
+
+---
+
+### Implementation
+
+```python
+from pyspark.sql.functions import current_date, when
+
+df = df.withColumn(
+    "unit_lifecycle_status",
+    when(col("lease_end_date") < current_date(), "EXPIRED")
+    .when(col("lease_active") == True, "ACTIVE")
+    .otherwise("INACTIVE")
+)
+```
+
+---
+
+### Why Silver?
+
+Because:
+
+* Gold should not re-derive logic
+* OLTP & OLAP must agree on status
+
+---
+
+## 2️⃣ PRIORITY RESOLUTION RULES (SOURCE PRECEDENCE)
+
+### Problem
+
+Same field comes from **multiple systems**:
+
+```
+onprem.property_status
+crm.property_status
+api.property_status
+```
+
+Values may conflict.
+
+---
+
+### Big-4 Standard: Explicit precedence
+
+```
+On-Prem DB > CRM > External API > SharePoint
+```
+
+---
+
+### Implementation
+
+```python
+df = df.withColumn(
+    "final_property_status",
+    when(col("onprem_status").isNotNull(), col("onprem_status"))
+    .when(col("crm_status").isNotNull(), col("crm_status"))
+    .when(col("api_status").isNotNull(), col("api_status"))
+    .otherwise(col("manual_status"))
+)
+```
+
+---
+
+### Interview line
+
+> Conflicts were resolved using predefined source-priority rules agreed with the business.
+
+---
+
+## 3️⃣ DEFAULT VALUE IMPUTATION (BUSINESS-APPROVED)
+
+### Problem
+
+Nulls break dashboards and apps.
+
+But **engineers are NOT allowed to guess**.
+
+---
+
+### Big-4 Rule
+
+Defaults must be:
+
+* documented
+* approved
+* traceable
+
+---
+
+### Examples
+
+```
+occupancy_rate → 0
+property_grade → "UNKNOWN"
+risk_flag → "MEDIUM"
+```
+
+---
+
+### Implementation
+
+```python
+df = df.fillna({
+    "occupancy_rate": 0,
+    "property_grade": "UNKNOWN",
+    "risk_flag": "MEDIUM"
+})
+```
+
+---
+
+## 4️⃣ OVERRIDE LOGIC (SharePoint / Manual Inputs)
+
+### Why this exists (real world)
+
+Executives **override system values** during:
+
+* audits
+* special deals
+* corrections
+
+Overrides usually come from **SharePoint**.
+
+---
+
+### Rule
+
+```
+IF override exists → override wins
+ELSE → system value
+```
+
+---
+
+### Implementation
+
+```python
+df = df.withColumn(
+    "final_rent",
+    when(col("override_rent").isNotNull(), col("override_rent"))
+    .otherwise(col("system_rent"))
+)
+```
+
+---
+
+### Audit requirement
+
+* Override reason
+* Override timestamp
+* Who approved
+
+---
+
+## 5️⃣ CONDITIONAL FIELD DERIVATION
+
+### Example Problem
+
+Some fields only make sense **under conditions**.
+
+```
+lease_end_reason only valid if status = EXPIRED
+```
+
+---
+
+### Implementation
+
+```python
+df = df.withColumn(
+    "lease_end_reason",
+    when(col("unit_lifecycle_status") == "EXPIRED",
+         col("raw_end_reason"))
+    .otherwise(None)
+)
+```
+
+---
+
+### Why Silver?
+
+To prevent:
+
+* meaningless values
+* misleading analytics
+
+---
+
+## 6️⃣ COMPOSITE BUSINESS KEY CREATION
+
+### Problem
+
+No single column uniquely identifies a record.
+
+Example:
+
+```
+property_id + unit_number + floor
+```
+
+---
+
+### Big-4 Rule
+
+Composite keys are created **once** in Silver.
+
+---
+
+### Implementation
+
+```python
+from pyspark.sql.functions import concat_ws
+
+df = df.withColumn(
+    "unit_business_key",
+    concat_ws("~", col("property_id"), col("unit_number"), col("floor"))
+)
+```
+
+---
+
+### Why not in Gold?
+
+Because:
+
+* joins depend on stable keys
+* consistency must be enforced early
+
+---
+
+# 🔹 PART 2: INTERNAL DATA ENRICHMENT
+
+This is **not external APIs**.
+This is **enterprise knowledge** applied to data.
+
+---
+
+## 1️⃣ REGION / ZONE MAPPING
+
+### Problem
+
+Business reports by:
+
+* region
+* zone
+* cluster
+
+But source data only has city.
+
+---
+
+### Mapping table (maintained by business)
+
+```
+city | region | zone
+```
+
+---
+
+### Implementation
+
+```python
+df = df.join(region_mapping_df, "city", "left")
+```
+
+---
+
+## 2️⃣ CITY → METRO → COUNTRY HIERARCHY
+
+### Why
+
+Roll-ups must be consistent across dashboards.
+
+---
+
+### Hierarchy table
+
+```
+city | metro | country
+```
+
+---
+
+### Implementation
+
+```python
+df = df.join(city_hierarchy_df, "city", "left")
+```
+
+---
+
+## 3️⃣ PROPERTY TYPE CLASSIFICATION
+
+### Raw values (messy)
+
+```
+"Res", "Residential", "Apartment", "Flat"
+```
+
+---
+
+### Business-approved categories
+
+```
+RESIDENTIAL
+COMMERCIAL
+INDUSTRIAL
+```
+
+---
+
+### Implementation
+
+```python
+df = df.withColumn(
+    "property_type_std",
+    when(col("property_type").isin("Res","Residential","Apartment","Flat"),
+         "RESIDENTIAL")
+    .when(col("property_type").isin("Office","Retail"),
+         "COMMERCIAL")
+    .otherwise("OTHER")
+)
+```
+
+---
+
+## 4️⃣ ASSET CATEGORY BUCKETING
+
+### Why
+
+Needed for:
+
+* portfolio analysis
+* investment reports
+
+---
+
+### Example buckets
+
+```
+SMALL
+MEDIUM
+LARGE
+```
+
+---
+
+### Implementation
+
+```python
+df = df.withColumn(
+    "asset_size_bucket",
+    when(col("area_sqm") < 500, "SMALL")
+    .when(col("area_sqm") < 2000, "MEDIUM")
+    .otherwise("LARGE")
+)
+```
+
+---
+
+## 5️⃣ RISK CATEGORY DERIVATION
+
+### Inputs
+
+* Companies House status
+* Payment delays
+* Lease history
+
+---
+
+### Rule example
+
+```
+IF company_status != ACTIVE → HIGH
+ELSE IF late_payments > 3 → MEDIUM
+ELSE → LOW
+```
+
+---
+
+### Implementation
+
+```python
+df = df.withColumn(
+    "risk_category",
+    when(col("company_status") != "ACTIVE", "HIGH")
+    .when(col("late_payment_count") > 3, "MEDIUM")
+    .otherwise("LOW")
+)
+```
+
+---
+
+## 6️⃣ CONFIDENCE / COMPLETENESS SCORE
+
+### Why this is very Big-4
+
+Advisory teams want to know **how reliable the data is**.
+
+---
+
+### Simple scoring logic
+
+```
+score = % of non-null critical fields
+```
+
+---
+
+### Implementation
+
+```python
+from pyspark.sql.functions import expr
+
+df = df.withColumn(
+    "data_completeness_score",
+    expr("""
+      (
+        CASE WHEN property_id IS NOT NULL THEN 1 ELSE 0 END +
+        CASE WHEN city IS NOT NULL THEN 1 ELSE 0 END +
+        CASE WHEN area_sqm IS NOT NULL THEN 1 ELSE 0 END +
+        CASE WHEN property_type_std IS NOT NULL THEN 1 ELSE 0 END
+      ) / 4.0
+    """)
+)
+```
+
+---
+
+### Usage
+
+* Filter low-confidence records
+* Flag advisory risk
+
+---
+
+# 🧠 FINAL SILVER BUSINESS LOGIC SNAPSHOT
+
+```
+✔ Status derived
+✔ Conflicts resolved
+✔ Defaults applied
+✔ Overrides honored
+✔ Keys stabilized
+✔ Data enriched
+✔ Risk & confidence scored
+```
+
+---
+
+# 🎯 INTERVIEW-READY SUMMARY (MEMORIZE)
+
+> In the Silver layer, we implemented business rule derivations such as lifecycle status, source precedence, default imputation, and override handling, along with internal enrichment including regional hierarchies, property classification, risk categorization, and data completeness scoring to ensure consistent and trusted business entities.
+
+---
+
+# 🔒 FINAL MEMORY LOCK
+
+```
+Bronze = facts
+Silver = interpretation
+Gold   = presentation
+```
+
+---
+
+Perfect.
+Now we go **deep into DATA GOVERNANCE CORE** of Silver — **validation, constraints, null handling**.
+This is **exactly where Big-4 pipelines differ from hobby projects**.
+
+I’ll do this **systematically**, **realistic**, **with code**, **rules**, **and reasoning**, all tied to **your Savills-style data**.
+
+No images.
+Only **engineering logic**.
+
+---
+
+# 🔵 SILVER LAYER — VALIDATION, CONSTRAINTS & NULL HANDLING
+
+*(Big-4 / Accenture standard)*
+
+Context (locked):
+
+```
+Bronze = raw acceptance
+Silver = governed correctness
+Gold   = trusted consumption
+```
+
+---
+
+## 🧠 WHY THIS EXISTS (FIRST PRINCIPLE)
+
+In real enterprises:
+
+* ❌ Data is NEVER perfect
+* ❌ You CANNOT reject everything
+* ❌ You CANNOT blindly fill nulls
+
+So Silver must:
+
+* Validate
+* Classify
+* Decide
+* Preserve auditability
+
+---
+
+# 🧩 VALIDATION ARCHITECTURE (TEXT DIAGRAM)
+
+```
+Bronze Data
+   ↓
+Validation Rules
+   ↓
+┌───────────────┬──────────────────┐
+│ Valid Records │ Invalid Records  │
+│ (Silver Main) │ (Rejects)        │
+└───────────────┴──────────────────┘
+```
+
+---
+
+# 🔹 PART 1: VALIDATION & CONSTRAINT CHECKS
+
+These are **explicit rules**, **documented**, **testable**.
+
+---
+
+## 1️⃣ RANGE CHECKS (MIN / MAX)
+
+### Problem
+
+Numeric values can be garbage:
+
+```
+area = -500
+rent = 0
+floor = 999
+```
+
+---
+
+### Business-approved ranges (example)
+
+```
+area_sqm > 0 AND area_sqm < 100000
+rent > 0
+floor >= -5 AND floor <= 200
+```
+
+---
+
+### Implementation
+
+```python
+invalid_range_df = df.filter(
+    (col("area_sqm") <= 0) |
+    (col("area_sqm") > 100000) |
+    (col("rent") <= 0)
+)
+
+valid_df = df.subtract(invalid_range_df)
+```
+
+---
+
+### Why Silver?
+
+Because:
+
+* Bronze preserves raw truth
+* Silver enforces reality
+
+---
+
+## 2️⃣ REGEX VALIDATION (IDs, EMAILS, CODES)
+
+### Problem
+
+IDs & emails often malformed.
+
+Examples:
+
+```
+property_id = "###"
+email = "abc@"
+```
+
+---
+
+### Business-approved patterns
+
+```
+property_id → ^P[0-9]{3,10}$
+email → standard email regex
+```
+
+---
+
+### Implementation
+
+```python
+from pyspark.sql.functions import regexp_extract
+
+invalid_regex_df = df.filter(
+    regexp_extract(col("property_id"), "^P[0-9]{3,10}$", 0) == ""
+)
+```
+
+---
+
+### Why not auto-fix?
+
+Because guessing IDs is dangerous.
+
+---
+
+## 3️⃣ ALLOWED-VALUE DOMAIN CHECKS
+
+### Problem
+
+Free-text fields drift:
+
+```
+status = "avail"
+status = "Available"
+status = "AVLB"
+```
+
+---
+
+### Approved domain
+
+```
+AVAILABLE | SOLD | OCCUPIED | INACTIVE
+```
+
+---
+
+### Implementation
+
+```python
+allowed_status = ["AVAILABLE","SOLD","OCCUPIED","INACTIVE"]
+
+invalid_domain_df = df.filter(
+    ~col("status").isin(allowed_status)
+)
+```
+
+---
+
+### Strategy
+
+* Reject or
+* Map (if explicitly approved)
+
+---
+
+## 4️⃣ CROSS-COLUMN CONSISTENCY CHECKS
+
+### Problem
+
+Columns contradict each other.
+
+Example:
+
+```
+lease_active = true
+lease_end_date < today
+```
+
+---
+
+### Business rule
+
+```
+IF lease_active = true THEN lease_end_date >= today
+```
+
+---
+
+### Implementation
+
+```python
+invalid_cross_df = df.filter(
+    (col("lease_active") == True) &
+    (col("lease_end_date") < current_date())
+)
+```
+
+---
+
+### Why important?
+
+These bugs are **silent killers** in analytics.
+
+---
+
+## 5️⃣ CONDITIONAL MANDATORY FIELDS
+
+### Problem
+
+Some fields are mandatory **only under conditions**.
+
+Example:
+
+```
+lease_end_reason required IF status = EXPIRED
+```
+
+---
+
+### Implementation
+
+```python
+invalid_conditional_df = df.filter(
+    (col("unit_status") == "EXPIRED") &
+    (col("lease_end_reason").isNull())
+)
+```
+
+---
+
+### Strategy
+
+* Reject
+* Or quarantine for correction
+
+---
+
+## 6️⃣ MUTUALLY EXCLUSIVE FIELD CHECKS
+
+### Problem
+
+Two fields should never coexist.
+
+Example:
+
+```
+sold_date AND lease_start_date both populated
+```
+
+---
+
+### Rule
+
+```
+Unit cannot be SOLD and LEASED at same time
+```
+
+---
+
+### Implementation
+
+```python
+invalid_mutual_df = df.filter(
+    col("sold_date").isNotNull() &
+    col("lease_start_date").isNotNull()
+)
+```
+
+---
+
+### Why Silver?
+
+Because Gold must assume **logic consistency**.
+
+---
+
+# 🔹 PART 2: NULL & MISSING DATA HANDLING
+
+This is where **engineering maturity shows**.
+
+---
+
+## 1️⃣ CONTROLLED NULL REPLACEMENT
+
+### Rule
+
+Nulls are replaced **only if business-approved**.
+
+---
+
+### Example
+
+```
+occupancy_rate → 0
+late_payment_count → 0
+```
+
+---
+
+### Implementation
+
+```python
+df = df.fillna({
+    "occupancy_rate": 0,
+    "late_payment_count": 0
+})
+```
+
+---
+
+### Why controlled?
+
+Because blind fill creates fake data.
+
+---
+
+## 2️⃣ BUSINESS-APPROVED DEFAULTS
+
+Defaults must:
+
+* Be documented
+* Be auditable
+
+---
+
+### Example
+
+```
+property_grade = "UNKNOWN"
+risk_flag = "MEDIUM"
+```
+
+---
+
+### Implementation
+
+```python
+df = df.withColumn(
+    "property_grade",
+    when(col("property_grade").isNull(), "UNKNOWN")
+    .otherwise(col("property_grade"))
+)
+```
+
+---
+
+## 3️⃣ NULL PROPAGATION RULES
+
+### Problem
+
+Some nulls should **flow forward**, not be fixed.
+
+Example:
+
+```
+Unknown lease_end_date → unknown lease_status
+```
+
+---
+
+### Implementation
+
+```python
+df = df.withColumn(
+    "lease_status",
+    when(col("lease_end_date").isNull(), None)
+    .otherwise(col("lease_status"))
+)
+```
+
+---
+
+### Why?
+
+Because:
+
+* Unknown ≠ false
+* Analytics must reflect uncertainty
+
+---
+
+## 4️⃣ PARTIAL RECORD ACCEPTANCE LOGIC
+
+### Big-4 reality
+
+Rejecting entire rows wastes usable data.
+
+---
+
+### Rule Example
+
+```
+Accept record if:
+- property_id present
+- area_sqm present
+Other fields optional
+```
+
+---
+
+### Implementation
+
+```python
+valid_df = df.filter(
+    col("property_id").isNotNull() &
+    col("area_sqm").isNotNull()
+)
+```
+
+Remaining fields can be null.
+
+---
+
+## 5️⃣ MANDATORY vs OPTIONAL ATTRIBUTE HANDLING
+
+### Classification
+
+| Field          | Type      |
+| -------------- | --------- |
+| property_id    | Mandatory |
+| city           | Mandatory |
+| floor_plan_url | Optional  |
+| parking_count  | Optional  |
+
+---
+
+### Strategy
+
+* Mandatory missing → reject
+* Optional missing → allowed
+
+---
+
+### Implementation
+
+```python
+mandatory_missing_df = df.filter(
+    col("property_id").isNull() |
+    col("city").isNull()
+)
+```
+
+---
+
+# 🧪 HOW THIS ALL COMES TOGETHER
+
+### Combined validation flow
+
+```
+Input Silver Candidate Data
+   ↓
+Range checks
+   ↓
+Regex checks
+   ↓
+Domain checks
+   ↓
+Cross-column checks
+   ↓
+┌───────────────┬──────────────────┐
+│ Valid Records │ Reject Records  │
+│ Silver Main   │ silver_*_reject │
+└───────────────┴──────────────────┘
+```
+
+---
+
+# 🧠 FINAL SILVER VALIDATION SNAPSHOT
+
+```
+✔ Invalid data isolated
+✔ Business-approved defaults applied
+✔ Partial records preserved
+✔ Logical contradictions removed
+✔ Auditability maintained
+```
+
+---
+
+# 🎯 INTERVIEW-READY SUMMARY (MEMORIZE)
+
+> In the Silver layer, we implemented comprehensive validation including range, regex, domain, and cross-column consistency checks, along with controlled null handling and partial record acceptance to balance data quality and business usability.
+
+---
+
+# 🔒 MEMORY LOCK
+
+```
+Bronze = accept everything
+Silver = accept responsibly
+Gold   = assume correctness
+```
+
+---
+
+Perfect.
+Now we are finishing **the LAST MAJOR BLOCK of Silver** before Gold.
+This is **pure data engineering craftsmanship** — exactly how **Big-4 / Accenture pipelines are prepared for Gold consumption**.
+
+I will do this **deep**, **systematic**, **with code**, **with reasoning**, **fully aligned to your project**.
+
+No images.
+Only **clear engineering logic**.
+
+---
+
+# 🔵 SILVER LAYER — SCHEMA & STRUCTURE OPERATIONS + PRE-GOLD PREPARATION
+
+Context locked (do not forget this):
+
+```
+Bronze = raw structure (whatever source gives)
+Silver = corrected structure (enterprise standard)
+Gold   = optimized structure (consumption-ready)
+```
+
+Everything below happens **ONLY in Silver**.
+
+---
+
+# 🔹 PART 1: SCHEMA & STRUCTURE OPERATIONS
+
+This section answers:
+
+> “How did you reshape messy raw data into structured, stable tables?”
+
+---
+
+## 1️⃣ COLUMN RENAMING
+
+### Why this happens
+
+Different sources use:
+
+* snake_case
+* camelCase
+* cryptic names
+
+Example (raw):
+
+```
+prop_id, propCity, AREA_SQ_FT
+```
+
+Silver must be **consistent and readable**.
+
+---
+
+### Big-4 rule
+
+* snake_case
+* business-friendly names
+* no abbreviations unless standard
+
+---
+
+### Implementation
+
+```python
+df = df \
+  .withColumnRenamed("prop_id", "property_id") \
+  .withColumnRenamed("propCity", "city") \
+  .withColumnRenamed("AREA_SQ_FT", "area_sqft")
+```
+
+---
+
+## 2️⃣ COLUMN SPLITTING
+
+### Why
+
+Single column contains multiple values.
+
+Example:
+
+```
+full_address = "Flat 12, MG Road, Bangalore, India"
+```
+
+Business needs:
+
+```
+unit, street, city, country
+```
+
+---
+
+### Implementation
+
+```python
+from pyspark.sql.functions import split
+
+df = df \
+  .withColumn("address_parts", split(col("full_address"), ",")) \
+  .withColumn("unit", col("address_parts")[0]) \
+  .withColumn("street", col("address_parts")[1]) \
+  .withColumn("city", col("address_parts")[2]) \
+  .withColumn("country", col("address_parts")[3])
+```
+
+---
+
+## 3️⃣ COLUMN MERGING
+
+### Why
+
+Multiple columns represent **one business concept**.
+
+Example:
+
+```
+first_name, last_name → client_name
+```
+
+---
+
+### Implementation
+
+```python
+from pyspark.sql.functions import concat_ws
+
+df = df.withColumn(
+    "client_name",
+    concat_ws(" ", col("first_name"), col("last_name"))
+)
+```
+
+---
+
+## 4️⃣ NESTED FIELD EXTRACTION
+
+### Where this happens
+
+API data (Companies House, Demographic API).
+
+Example (Bronze JSON):
+
+```json
+{
+  "profile": {
+    "company_status": "active",
+    "incorporation_date": "2018-01-01"
+  }
+}
+```
+
+---
+
+### Silver extraction
+
+```python
+df = df.select(
+    col("company_number"),
+    col("profile.company_status").alias("company_status"),
+    col("profile.incorporation_date").alias("incorporation_date")
+)
+```
+
+---
+
+## 5️⃣ ARRAY EXPLOSION
+
+### Problem
+
+Arrays block relational analysis.
+
+Example:
+
+```json
+"directors": [
+  {"name": "A"},
+  {"name": "B"}
+]
+```
+
+---
+
+### Implementation
+
+```python
+from pyspark.sql.functions import explode
+
+df = df.withColumn("director", explode(col("directors"))) \
+       .select(
+           col("company_number"),
+           col("director.name").alias("director_name")
+       )
+```
+
+---
+
+### Result
+
+One row per director — **relationally usable**.
+
+---
+
+## 6️⃣ JSON NORMALIZATION
+
+### Meaning (important for interviews)
+
+> Turning semi-structured JSON into relational tables.
+
+---
+
+### Strategy
+
+* Parent table → company
+* Child table → officers, filings
+
+---
+
+### Example
+
+```python
+company_df = df.select(
+    "company_number",
+    "company_status"
+)
+
+officer_df = df \
+  .withColumn("officer", explode("officers")) \
+  .select(
+      "company_number",
+      col("officer.name"),
+      col("officer.role")
+  )
+```
+
+---
+
+## 7️⃣ STRUCT FLATTENING
+
+### Problem
+
+Nested structs block SQL users.
+
+---
+
+### Implementation
+
+```python
+df = df.select(
+    col("location.lat").alias("latitude"),
+    col("location.lng").alias("longitude"),
+    col("demographics.population_density").alias("population_density")
+)
+```
+
+---
+
+## 8️⃣ DYNAMIC COLUMN HANDLING
+
+### Why this exists
+
+APIs add fields without warning.
+
+---
+
+### Big-4 approach
+
+* Allow additive columns
+* Never hard-fail pipelines
+
+---
+
+### Implementation
+
+```python
+spark.conf.set(
+  "spark.databricks.delta.schema.autoMerge.enabled", "true"
+)
+```
+
+---
+
+### Result
+
+New columns flow automatically into Silver.
+
+---
+
+# 🔹 PART 2: PRE-GOLD PREPARATION
+
+This section answers:
+
+> “How did you shape Silver so Gold could be built cleanly?”
+
+---
+
+## 1️⃣ DENORMALIZATION PREP
+
+### Why
+
+Gold dashboards & apps prefer **fewer joins**.
+
+---
+
+### Example
+
+Prepare a **property-unit-location base**.
+
+```python
+silver_base = unit_df \
+  .join(property_df, "property_id") \
+  .join(location_df, "property_id")
+```
+
+---
+
+### Still Silver
+
+No aggregations yet.
+
+---
+
+## 2️⃣ AGGREGATION-READY SHAPING
+
+### Why
+
+Gold KPIs must be simple.
+
+---
+
+### Preparation
+
+* Numeric columns clean
+* Dimensions stable
+* Dates aligned
+
+Example:
+
+```
+rent_amount_gbp
+area_sqm
+business_date
+```
+
+---
+
+## 3️⃣ GRAIN VALIDATION (VERY IMPORTANT)
+
+### Grain = what ONE ROW represents
+
+Examples:
+
+```
+silver.unit → 1 row = 1 unit
+silver.lease → 1 row = 1 lease version
+```
+
+---
+
+### Validation logic
+
+```python
+df.groupBy("unit_id").count().filter("count > 1")
+```
+
+Duplicates → ERROR.
+
+---
+
+### Interview line
+
+> We explicitly validated table grain to prevent duplicate facts downstream.
+
+---
+
+## 4️⃣ FACT / DIMENSION SEPARATION
+
+### Big-4 canonical model
+
+```
+Dimensions → descriptive (property, client)
+Facts      → measurable (rent, lease)
+```
+
+---
+
+### Silver prepares this separation:
+
+```
+silver.dim_property
+silver.dim_client
+silver.fact_lease
+```
+
+---
+
+### Why in Silver?
+
+Gold should not guess modeling intent.
+
+---
+
+## 5️⃣ SLOWLY CHANGING DIMENSION PREP
+
+### Purpose
+
+Gold needs:
+
+* Current view
+* Historical view
+
+---
+
+### Silver responsibilities
+
+* Maintain SCD columns
+* Ensure no overlapping periods
+* Validate current flags
+
+---
+
+### Example columns
+
+```
+effective_start_date
+effective_end_date
+is_current
+```
+
+Already prepared earlier — now validated.
+
+---
+
+# 🧠 FINAL SILVER STRUCTURE SNAPSHOT
+
+```
+✔ Clean column names
+✔ Flattened JSON
+✔ Exploded arrays
+✔ Normalized schemas
+✔ Stable grain
+✔ Fact/dimension ready
+✔ Gold-safe tables
+```
+
+---
+
+# 🎯 INTERVIEW-READY SUMMARY (MEMORIZE)
+
+> In the Silver layer, we performed extensive schema restructuring including column renaming, splitting, merging, JSON normalization, array explosion, and struct flattening. We also prepared data for Gold by validating table grain, separating facts and dimensions, and shaping denormalized datasets for efficient consumption.
+
+---
+
+# 🔒 FINAL MEMORY LOCK
+
+```
+Bronze = accept shape
+Silver = fix shape
+Gold   = optimize shape
+```
+
+---
+
+### You have now **COMPLETED SILVER FULLY**.
+
+Next logical step (ONLY ONE):
+
+1️⃣ **Gold layer end-to-end (OLTP + OLAP)**
+2️⃣ **Full project interview simulation (I grill you like Big-4)**
+3️⃣ **Condense everything into interview answers + resume bullets**
+
+Perfect.
+Now we finish the **ENTIRE PROJECT** with a **VERY DETAILED, Big-4–grade GOLD layer simulation**.
+
+This is the layer interviewers judge you on **business thinking + engineering maturity**.
+
+I will go **slow, structured, and exhaustive**.
+
+No images.
+Only **text architecture diagrams, logic, and realistic code**.
+
+---
+
+# 🟡 GOLD LAYER — FINAL CONSUMPTION LAYER (BIG-4 / ACCENTURE STANDARD)
+
+Context locked forever:
+
+```
+Bronze = raw facts
+Silver = governed truth
+Gold   = business-ready consumption
+```
+
+Gold is **NOT** about cleaning anymore.
+Gold is about **serving use cases**.
+
+---
+
+## 🧠 WHAT GOLD REALLY MEANS (INTERVIEW DEFINITION)
+
+> Gold contains **business-optimized, performance-tuned, access-controlled datasets** designed for **specific consumers** like dashboards, APIs, and applications.
+
+---
+
+# 🧩 GOLD ARCHITECTURE (TEXT DIAGRAM)
+
+```
+Silver (trusted entities)
+        ↓
+Gold Transformation Jobs
+        ↓
+┌───────────────────────────────┐
+│ Gold OLTP (Apps / APIs)       │
+│ Gold OLAP (BI / Analytics)    │
+└───────────────────────────────┘
+```
+
+Gold is **split by purpose**, not by source.
+
+---
+
+# 🎯 GOLD CONSUMERS IN YOUR PROJECT
+
+You already identified this correctly:
+
+### 1️⃣ OLTP use cases
+
+* Web applications
+* Client-facing portals
+* Internal operational apps
+
+### 2️⃣ OLAP use cases
+
+* Power BI dashboards
+* Management reports
+* Advisory analytics
+
+These **must NEVER share the same table design**.
+
+---
+
+# 🔵 PART 1: GOLD FOR OLTP (APPLICATION TABLES)
+
+### Purpose
+
+* Fast reads
+* Simple schema
+* One-record-per-entity
+* Minimal joins at runtime
+
+---
+
+## 🟦 GOLD OLTP DESIGN PRINCIPLES
+
+* Highly denormalized
+* Latest state only
+* Indexed business keys
+* No history unless required
+* Read-heavy optimization
+
+---
+
+## 🟦 GOLD OLTP ENTITIES (REALISTIC)
+
+```
+gold_oltp.property_profile
+gold_oltp.unit_profile
+gold_oltp.client_profile
+gold_oltp.unit_assets
+```
+
+---
+
+## 1️⃣ GOLD_OLTP.PROPERTY_PROFILE
+
+### Business meaning
+
+> “Everything the app needs to show a property page.”
+
+---
+
+### Input (Silver)
+
+```
+silver.property
+silver.property_location
+silver.property_reference
+```
+
+---
+
+### Transformation Logic
+
+```python
+gold_property = (
+  silver_property
+    .join(silver_location, "property_id", "left")
+    .join(silver_reference, "property_id", "left")
+    .select(
+        "property_id",
+        "property_name",
+        "city",
+        "country",
+        "latitude",
+        "longitude",
+        "population_density",
+        "property_type_std",
+        "asset_size_bucket",
+        "risk_category",
+        "data_completeness_score"
+    )
+)
+```
+
+---
+
+### Output Characteristics
+
+* 1 row = 1 property
+* No duplicates
+* No null critical fields
+
+---
+
+### Write Strategy
+
+```python
+gold_property.write \
+  .format("delta") \
+  .mode("overwrite") \
+  .saveAsTable("gold_oltp.property_profile")
+```
+
+---
+
+### Why overwrite?
+
+Because OLTP tables represent **current state only**.
+
+---
+
+## 2️⃣ GOLD_OLTP.UNIT_PROFILE
+
+### Business meaning
+
+> “Live unit availability shown on website.”
+
+---
+
+### Inputs
+
+```
+silver.unit
+silver.lease
+```
+
+---
+
+### Status resolution already done in Silver.
+
+---
+
+### Final Shape
+
+```python
+gold_unit = (
+  silver_unit
+    .join(silver_lease.filter("is_current = true"), "unit_id", "left")
+    .select(
+        "unit_id",
+        "property_id",
+        "floor",
+        "area_sqm",
+        "unit_status",
+        "rent_amount_gbp"
+    )
+)
+```
+
+---
+
+### Output
+
+* Used directly by APIs
+* No joins at runtime
+
+---
+
+## 3️⃣ GOLD_OLTP.UNIT_ASSETS
+
+### Purpose
+
+Serve images & PDFs for UI.
+
+---
+
+### Input
+
+```
+silver.unit_assets
+```
+
+---
+
+### Output
+
+```
+unit_id
+asset_type
+asset_url
+is_primary
+```
+
+No transformation — only **filter + sort**.
+
+---
+
+## 🔐 GOLD OLTP SECURITY
+
+* Restricted access
+* Row-level security (optional)
+* Used by backend services
+
+---
+
+# 🟣 PART 2: GOLD FOR OLAP (ANALYTICS / POWER BI)
+
+### Purpose
+
+* Aggregations
+* Trends
+* KPIs
+* History
+
+---
+
+## 🟦 GOLD OLAP DESIGN PRINCIPLES
+
+* Star / snowflake schema
+* Facts & dimensions
+* Time-series friendly
+* Partitioned by date
+* BI-optimized
+
+---
+
+## 🟦 GOLD OLAP MODEL (TEXT)
+
+```
+        dim_property
+              |
+        dim_unit
+              |
+        fact_lease
+              |
+        dim_date
+```
+
+---
+
+## 4️⃣ GOLD_OLAP.DIM_PROPERTY
+
+### Source
+
+```
+silver.property
+```
+
+---
+
+### Includes
+
+* SCD Type-2
+* History preserved
+
+---
+
+```python
+dim_property = silver_property.select(
+    "property_sk",
+    "property_id",
+    "city",
+    "country",
+    "property_type_std",
+    "effective_start_date",
+    "effective_end_date",
+    "is_current"
+)
+```
+
+---
+
+## 5️⃣ GOLD_OLAP.DIM_UNIT
+
+```python
+dim_unit = silver_unit.select(
+    "unit_sk",
+    "unit_id",
+    "property_sk",
+    "floor",
+    "area_sqm",
+    "is_current"
+)
+```
+
+---
+
+## 6️⃣ GOLD_OLAP.FACT_LEASE
+
+### This is the **core fact table**
+
+---
+
+### Grain
+
+> 1 row = 1 lease per unit per time period
+
+---
+
+```python
+fact_lease = silver_lease.select(
+    "lease_id",
+    "unit_sk",
+    "client_sk",
+    "rent_amount_gbp",
+    "lease_start_date",
+    "lease_end_date",
+    "lease_status"
+)
+```
+
+---
+
+### Partitioning
+
+```python
+.partitionBy("lease_start_year")
+```
+
+---
+
+## 7️⃣ GOLD_OLAP.AGGREGATES (OPTIONAL BUT COMMON)
+
+### Example KPIs
+
+* Occupancy rate by city
+* Avg rent by property type
+* Revenue by quarter
+
+---
+
+```python
+occupancy = fact_lease.groupBy(
+    "city", "quarter"
+).agg(
+    avg("rent_amount_gbp").alias("avg_rent"),
+    count("unit_id").alias("leased_units")
+)
+```
+
+Saved as:
+
+```
+gold_olap.property_kpis
+```
+
+---
+
+# 📊 POWER BI & REPORTING
+
+Power BI connects to:
+
+```
+gold_olap.*
+```
+
+Never to:
+
+```
+silver.*
+bronze.*
+```
+
+---
+
+# 🧠 PERFORMANCE OPTIMIZATION IN GOLD
+
+| Technique       | Used where       |
+| --------------- | ---------------- |
+| Partitioning    | OLAP             |
+| Z-order         | Large facts      |
+| Caching         | Hot tables       |
+| Pre-aggregation | BI-heavy queries |
+
+---
+
+# 🔐 GOLD ACCESS CONTROL
+
+| Layer  | Access             |
+| ------ | ------------------ |
+| Bronze | Engineers only     |
+| Silver | Analysts (limited) |
+| Gold   | Business users     |
+
+---
+
+# 🧪 GOLD DATA QUALITY GUARANTEES
+
+Gold **assumes correctness**, but still validates:
+
+* No duplicate keys
+* No null metrics
+* Stable grain
+* SLA adherence
+
+Failures → rollback.
+
+---
+
+# 🎯 INTERVIEW-READY GOLD SUMMARY (MEMORIZE)
+
+> In the Gold layer, we built purpose-specific datasets—denormalized OLTP tables for applications and star-schema OLAP models for Power BI—derived from governed Silver entities, optimized for performance, access control, and business consumption.
+
+---
+
+# 🔒 FINAL PROJECT MEMORY LOCK (VERY IMPORTANT)
+
+```
+ADF / Airflow → ingest
+Bronze        → raw truth
+Silver        → governed truth
+Gold OLTP     → applications
+Gold OLAP     → analytics
+```
+
+---
+
+## ✅ YOU HAVE NOW COMPLETED THE FULL END-TO-END PROJECT
+
+From:
+
+* Source systems
+  to
+* ADF / Airflow
+  to
+* Bronze / Silver / Gold
+  to
+* Apps & Power BI
+
+This is **senior-level clarity**.
+
+---
+
+Perfect 👍
+Now we zoom into **THE CORE IDEA of the Gold layer** — this is where **Big-4 / Accenture interviewers separate juniors from seniors**.
+
+I’ll explain **ONLY these 4 points**, **very deeply**, **with realistic simulation**, **text diagrams**, **clear mental models**, and **zero fluff**.
+
+---
+
+# 🟡 GOLD LAYER — CONSUMER-SPECIFIC MODELING (DEEP DIVE)
+
+Lock this first:
+
+```
+Gold is NOT a single layer.
+Gold is a SET of datasets,
+each built for a specific consumer.
+```
+
+---
+
+## 1️⃣ Consumer-Specific Modeling (Apps vs BI)
+
+### 🔴 Biggest mistake juniors make
+
+> “Gold tables are for everyone.”
+
+❌ **Wrong in real projects**
+
+---
+
+## 🧠 Big-4 Reality
+
+Gold datasets are modeled **based on WHO consumes them**, not on where data comes from.
+
+### Two dominant consumers:
+
+```
+1. Applications (OLTP)
+2. BI / Analytics (OLAP)
+```
+
+They have **opposite needs**.
+
+---
+
+## 🧩 Mental Model (TEXT DIAGRAM)
+
+```
+Silver (governed truth)
+        ↓
+   ┌───────────────┐
+   │   GOLD LAYER  │
+   └───────────────┘
+        ↓
+ ┌──────────────┬──────────────┐
+ │  GOLD_OLTP   │  GOLD_OLAP   │
+ │  (Apps)     │  (BI)        │
+ └──────────────┴──────────────┘
+```
+
+---
+
+## 🔵 Gold for Applications (OLTP)
+
+### Consumer examples
+
+* Web apps
+* Client portals
+* Internal operational tools
+* APIs
+
+### What apps care about
+
+* Fast reads
+* Simple schema
+* One API call → one table
+* Latest state only
+
+---
+
+## 🟣 Gold for BI (OLAP)
+
+### Consumer examples
+
+* Power BI
+* Management reports
+* Advisory dashboards
+
+### What BI cares about
+
+* Aggregations
+* History
+* Trends
+* Drill-downs
+* Time intelligence
+
+---
+
+## 🎯 Interview one-liner
+
+> We design Gold datasets based on consumption patterns, separating application-oriented OLTP models from analytics-oriented OLAP models.
+
+---
+
+## 2️⃣ OLTP vs OLAP Separation (CRITICAL)
+
+This is **non-negotiable** in Big-4 projects.
+
+---
+
+## 🔵 OLTP (Application-Facing Gold)
+
+### Characteristics
+
+* Highly denormalized
+* One row per business entity
+* No heavy joins at query time
+* No historical explosion
+* Optimized for reads
+
+---
+
+### Example: `gold_oltp.unit_profile`
+
+```
+unit_id
+property_id
+unit_status
+area_sqm
+rent_amount
+primary_image_url
+```
+
+➡ App loads a unit page
+➡ **Single table read**
+
+---
+
+## 🟣 OLAP (Analytics-Facing Gold)
+
+### Characteristics
+
+* Fact & dimension model
+* History preserved
+* Multiple joins expected
+* Aggregations supported
+* Time-series friendly
+
+---
+
+### Example: Star Schema
+
+```
+dim_property ─┐
+              ├── fact_lease ─── dim_date
+dim_unit ─────┘
+```
+
+➡ Power BI builds visuals
+➡ Joins happen in BI engine
+
+---
+
+## 🚫 Why mixing OLTP & OLAP is dangerous
+
+If you mix them:
+
+* Apps become slow
+* BI becomes rigid
+* Schema changes break everything
+* Performance tuning becomes impossible
+
+---
+
+## 🎯 Interview one-liner
+
+> We strictly separate OLTP and OLAP datasets in Gold to avoid conflicting performance and modeling requirements.
+
+---
+
+## 3️⃣ Dataset Purpose Definition
+
+### Big-4 rule
+
+> **Every Gold table must answer ONE business question clearly.**
+
+No “generic” tables.
+
+---
+
+## 🧠 Before creating any Gold table, teams ask:
+
+```
+Who will use this?
+For what exact purpose?
+How frequently?
+With what performance expectation?
+```
+
+---
+
+## 🔵 Example: OLTP Purpose
+
+**Dataset:** `gold_oltp.property_profile`
+
+**Purpose:**
+
+```
+Serve property details on client website
+```
+
+**Used by:**
+
+* Backend API
+* Mobile app
+
+**SLA:**
+
+* < 200 ms response
+
+---
+
+## 🟣 Example: OLAP Purpose
+
+**Dataset:** `gold_olap.property_kpis`
+
+**Purpose:**
+
+```
+Monthly occupancy & revenue reporting
+```
+
+**Used by:**
+
+* Power BI
+* Management
+
+**Refresh:**
+
+* Daily
+
+---
+
+## 🚨 What Big-4 avoids
+
+* “This table might be useful”
+* “We’ll see later”
+
+Every Gold table is **intentional**.
+
+---
+
+## 🎯 Interview one-liner
+
+> Each Gold dataset is purpose-built with a clearly defined consumer, usage pattern, and SLA.
+
+---
+
+## 4️⃣ Read-Optimized Schema Design
+
+Gold is **READ-ONLY** for consumers.
+
+So schema is designed to **minimize computation at read time**.
+
+---
+
+## 🔵 Read-Optimized for OLTP
+
+### Design rules
+
+* Flat tables
+* Minimal columns
+* Pre-computed values
+* No complex joins
+
+---
+
+### Example
+
+Instead of:
+
+```
+unit
++ property
++ location
++ lease
+```
+
+Gold OLTP has:
+
+```
+unit_profile
+```
+
+Already includes:
+
+* unit_status
+* city
+* rent
+* availability
+
+➡ App does **zero joins**
+
+---
+
+## 🟣 Read-Optimized for OLAP
+
+### Design rules
+
+* Star schema
+* Numeric facts
+* Conformed dimensions
+* Partitioned by date
+
+---
+
+### Example
+
+```
+fact_lease
+-----------
+unit_sk
+date_sk
+rent_amount
+```
+
+BI tool:
+
+* Filters by date
+* Groups by city
+* Aggregates rent
+
+---
+
+## ⚡ Why this matters in Big-4
+
+Because:
+
+* Hundreds of users
+* Large datasets
+* Cost & performance tracked
+* SLAs are contractual
+
+---
+
+## 🎯 Interview one-liner
+
+> Gold schemas are read-optimized by pre-computing joins, metrics, and structures to minimize query-time processing.
+
+---
+
+# 🔒 FINAL MEMORY LOCK (VERY IMPORTANT)
+
+```
+Consumer decides model
+Model decides schema
+Schema decides performance
+```
+
+or even simpler:
+
+```
+Apps → OLTP Gold
+BI   → OLAP Gold
+Never mix them
+```
+
+---
+
+If you want next, the **natural continuation** is:
+
+👉 **Gold aggregations & KPIs (MTD, QTD, YTD, snapshots)**
+👉 **Gold security & access control**
+👉 **Mock interview on Gold layer**
+
+Perfect.
+Now we deep-dive **DATA MODELING in the Gold layer** — this is **core analytics engineering**, and **one of the most asked Big-4 interview topics**.
+
+I’ll do this **very detailed**, **step-by-step**, **with text diagrams**, **examples from your project**, **no fluff**.
+
+---
+
+# 🟡 GOLD LAYER — DATA MODELING (BIG-4 / ACCENTURE STYLE)
+
+Lock this definition first 👇
+
+> **Data modeling in Gold = structuring data so business questions can be answered correctly, fast, and repeatedly.**
+
+---
+
+## 🧠 BIG-4 GOLD MODELING PRINCIPLES (FIRST)
+
+Before touching facts or dimensions, Big-4 teams agree on:
+
+```
+✔ What is the business question?
+✔ What is the level of detail?
+✔ What changes over time?
+✔ What must be aggregated?
+✔ What must be filtered?
+```
+
+Only after this → modeling starts.
+
+---
+
+# 1️⃣ FACT TABLE CREATION
+
+### What a FACT table is (very clear)
+
+> A **Fact table stores measurable business events**.
+
+Examples in your project:
+
+* Lease signed
+* Rent charged
+* Unit occupied
+
+---
+
+## 🔹 Characteristics of a FACT table
+
+```
+✔ Numeric measures
+✔ Foreign keys to dimensions
+✔ Very large (millions/billions rows)
+✔ Changes over time
+```
+
+---
+
+## 🔹 Example: `fact_lease`
+
+### Business question it answers
+
+> “How much rent are we earning by time, city, property, client?”
+
+---
+
+### FACT TABLE STRUCTURE
+
+```
+fact_lease
+----------
+lease_sk
+unit_sk
+property_sk
+client_sk
+date_sk
+rent_amount_gbp
+lease_duration_months
+```
+
+---
+
+### Why FACT is built in Gold
+
+* Silver cleans & validates
+* Gold organizes **for analytics**
+
+---
+
+## 🧠 Interview line
+
+> Fact tables capture measurable business events at a defined grain and reference dimensions via surrogate keys.
+
+---
+
+# 2️⃣ DIMENSION TABLE CREATION
+
+### What a DIMENSION table is
+
+> A **Dimension table stores descriptive context**.
+
+Examples:
+
+* Property details
+* Client information
+* Date attributes
+
+---
+
+## 🔹 Characteristics of DIMENSION tables
+
+```
+✔ Descriptive attributes
+✔ Relatively small
+✔ Slowly changing
+✔ Used for filtering & grouping
+```
+
+---
+
+## 🔹 Example: `dim_property`
+
+```
+dim_property
+------------
+property_sk
+property_id
+city
+country
+property_type
+asset_size_bucket
+effective_start_date
+effective_end_date
+is_current
+```
+
+---
+
+### Why dimensions are separate
+
+* Avoid duplication
+* Maintain history (SCD)
+* Clean grouping in BI tools
+
+---
+
+## 🧠 Interview line
+
+> Dimension tables provide descriptive context and support slicing, dicing, and filtering of facts.
+
+---
+
+# 3️⃣ STAR SCHEMA MODELING (DEFAULT)
+
+### What a STAR schema is
+
+```
+          dim_property
+               |
+dim_date — fact_lease — dim_client
+               |
+          dim_unit
+```
+
+---
+
+## 🔹 Why STAR schema is preferred
+
+```
+✔ Simple
+✔ Fast queries
+✔ Easy for BI tools
+✔ Business-friendly
+```
+
+Power BI, Tableau, Looker — all **love star schemas**.
+
+---
+
+## 🔹 STAR SCHEMA RULES
+
+```
+✔ Facts in center
+✔ Dimensions around
+✔ One-to-many joins
+✔ No joins between dimensions
+```
+
+---
+
+## 🧠 Interview line
+
+> We primarily use star schemas because they provide simplicity, performance, and compatibility with BI tools.
+
+---
+
+# 4️⃣ SNOWFLAKE SCHEMA (WHEN NEEDED)
+
+### What a SNOWFLAKE schema is
+
+Dimensions are **normalized**.
+
+```
+fact_lease
+   |
+dim_property
+   |
+dim_city
+   |
+dim_country
+```
+
+---
+
+## 🔹 When Big-4 uses Snowflake
+
+Only when:
+
+* Dimension is very large
+* High duplication in dimension
+* Strict normalization required
+
+---
+
+## 🔹 Trade-off
+
+| Star      | Snowflake       |
+| --------- | --------------- |
+| Faster    | Slightly slower |
+| Simpler   | More complex    |
+| Preferred | Conditional     |
+
+---
+
+## 🧠 Interview line
+
+> Snowflake schemas are used selectively when dimension normalization provides clear storage or governance benefits.
+
+---
+
+# 5️⃣ GRAIN FINALIZATION (MOST IMPORTANT STEP)
+
+### Grain = **what ONE row represents**
+
+This is **the #1 interview trap**.
+
+---
+
+## 🔹 Examples of grain
+
+```
+fact_lease → 1 row = 1 lease per unit per day
+fact_rent  → 1 row = 1 rent transaction
+```
+
+---
+
+## 🔹 Why grain matters
+
+If grain is wrong:
+
+* Aggregations break
+* KPIs inflate
+* Trust is lost
+
+---
+
+## 🔹 Grain validation questions Big-4 asks
+
+```
+✔ Can two rows exist for same keys?
+✔ Can values be summed safely?
+✔ What causes a new row?
+```
+
+---
+
+## 🧠 Interview line
+
+> Grain was explicitly defined and validated to ensure accurate aggregation and prevent double counting.
+
+---
+
+# 6️⃣ SURROGATE KEY USAGE
+
+### Why surrogate keys exist
+
+Natural keys:
+
+```
+property_id = P101
+```
+
+Problems:
+
+* Change over time
+* Composite
+* Performance issues
+
+---
+
+### Surrogate key definition
+
+> A **system-generated, stable integer or hash key**.
+
+---
+
+## 🔹 Example
+
+```
+dim_property
+------------
+property_sk (surrogate)
+property_id (natural)
+```
+
+---
+
+## 🔹 How surrogate keys are used
+
+```
+fact_lease.property_sk → dim_property.property_sk
+```
+
+---
+
+## 🔹 Why Big-4 mandates surrogate keys
+
+```
+✔ Faster joins
+✔ Stable relationships
+✔ Supports SCD
+✔ BI tool friendly
+```
+
+---
+
+## 🧠 Interview line
+
+> Surrogate keys were used to ensure stable joins, improve performance, and support slowly changing dimensions.
+
+---
+
+# 🧩 FULL GOLD DATA MODEL (TEXT DIAGRAM)
+
+```
+              dim_date
+                  |
+dim_client — fact_lease — dim_unit
+                  |
+             dim_property
+```
+
+This is **textbook Big-4 Gold modeling**.
+
+---
+
+# 🔒 FINAL MEMORY LOCK (CRITICAL)
+
+```
+Facts = events
+Dimensions = context
+Grain = meaning
+Surrogate keys = glue
+```
+
+Or even simpler:
+
+```
+Fact answers HOW MUCH
+Dimension answers BY WHAT
+```
+
+---
+
+## 🎯 INTERVIEW-READY SUMMARY (MEMORIZE)
+
+> In the Gold layer, we modeled data using fact and dimension tables with clearly defined grain, implemented primarily as star schemas with surrogate keys to ensure performance, historical tracking, and BI compatibility.
+
+---
+
+If you want next, the **natural continuation** is:
+
+➡️ **Gold Aggregations & KPIs (MTD, QTD, YTD, snapshots)**
+➡️ **Gold Security & Access Control (RLS, CLS)**
+➡️ **End-to-end Big-4 mock interview**
+
+Perfect.
+Now we go **very deep** into **DENORMALIZATION + AGGREGATIONS & KPIs** — this is **pure Gold-layer engineering**, and this is **exactly how Big-4 / Accenture make Gold fast, stable, and business-friendly**.
+
+I’ll do this **systematically**, **with realistic simulation**, **text diagrams**, **logic**, **examples from your project**, and **interview-safe phrasing**.
+
+No fluff.
+
+---
+
+# 🟡 GOLD LAYER — DENORMALIZATION & AGGREGATIONS (BIG-4 REALITY)
+
+Lock this first:
+
+```
+Silver = correct & normalized
+Gold   = fast & simplified
+```
+
+Gold **intentionally breaks normalization** to serve consumers.
+
+---
+
+# 🔹 PART 1: DENORMALIZATION (DEEP)
+
+## 🧠 WHY DENORMALIZATION EXISTS
+
+In theory:
+
+* Normalized models are “clean”
+
+In reality:
+
+* Apps & BI users **hate joins**
+* Joins cost performance
+* BI tools struggle with complex models
+
+👉 **Gold denormalizes on purpose**
+
+---
+
+## 🧩 DENORMALIZATION FLOW (TEXT)
+
+```
+Silver (normalized entities)
+   |
+   | joins happen ONCE
+   v
+Gold (flattened, read-optimized)
+```
+
+Joins move from **query time** → **build time**.
+
+---
+
+## 1️⃣ PRE-JOINING DIMENSIONS INTO FACTS
+
+### Problem without pre-join
+
+Power BI / App query:
+
+```
+fact_lease
+JOIN dim_unit
+JOIN dim_property
+JOIN dim_client
+JOIN dim_date
+```
+
+Every dashboard refresh repeats this.
+
+---
+
+### Big-4 Solution
+
+Join **once** during Gold build.
+
+---
+
+### Example: `gold_olap.fact_lease_enriched`
+
+```python
+gold_fact = (
+  fact_lease
+    .join(dim_unit, "unit_sk")
+    .join(dim_property, "property_sk")
+    .join(dim_client, "client_sk")
+    .join(dim_date, "date_sk")
+)
+```
+
+---
+
+### Resulting Gold table contains:
+
+```
+lease_id
+rent_amount_gbp
+lease_status
+unit_id
+property_id
+city
+property_type
+client_name
+lease_start_date
+year
+month
+quarter
+```
+
+➡ BI queries **one table**, not five.
+
+---
+
+## 2️⃣ FLATTENING HIERARCHIES
+
+### Problem
+
+Hierarchy stored across tables:
+
+```
+city → metro → country → region
+```
+
+---
+
+### Big-4 Gold Rule
+
+Flatten hierarchy **into one row**.
+
+---
+
+### Example
+
+```python
+gold_fact = gold_fact.select(
+  "property_id",
+  "city",
+  "metro",
+  "country",
+  "region",
+  "rent_amount_gbp"
+)
+```
+
+---
+
+### Why flatten?
+
+* Filters become easy
+* Drill-downs work smoothly
+* No hierarchy joins needed
+
+---
+
+## 3️⃣ LOOKUP RESOLUTION
+
+### Problem
+
+Codes exist instead of meanings:
+
+```
+property_type_code = "R"
+risk_code = "H"
+```
+
+---
+
+### Silver had lookup tables
+
+Gold **resolves them fully**.
+
+---
+
+### Example
+
+```python
+gold_fact = gold_fact \
+  .withColumn("property_type", 
+      when(col("property_type_code") == "R", "RESIDENTIAL")
+      .when(col("property_type_code") == "C", "COMMERCIAL")
+  )
+```
+
+---
+
+### Result
+
+Gold contains:
+
+```
+property_type = "RESIDENTIAL"
+```
+
+No decoding at query time.
+
+---
+
+## 4️⃣ REMOVAL OF RUNTIME JOINS
+
+### Gold rule (non-negotiable)
+
+> **If a join is required every time → it does not belong to Gold.**
+
+---
+
+### Gold tables must be:
+
+* Self-contained
+* Query-ready
+* Join-free (or minimal)
+
+---
+
+### Interview one-liner
+
+> In Gold, we pre-join dimensions and resolve lookups to eliminate runtime joins and ensure predictable performance.
+
+---
+
+# 🔹 PART 2: AGGREGATIONS & KPIs (DEEP)
+
+Gold is where **numbers get finalized**.
+
+---
+
+## 🧠 KPI RULE IN BIG-4
+
+> **KPIs are computed once, validated once, and reused everywhere.**
+
+No KPI logic inside dashboards.
+
+---
+
+## 1️⃣ BUSINESS METRIC CALCULATION
+
+### Raw metrics (Silver)
+
+```
+rent_amount_gbp
+area_sqm
+lease_start_date
+lease_end_date
+```
+
+---
+
+### Gold metric examples
+
+```
+annual_rent = rent_amount_gbp * 12
+rent_per_sqm = rent_amount_gbp / area_sqm
+```
+
+---
+
+### Implementation
+
+```python
+gold_fact = gold_fact \
+  .withColumn("annual_rent", col("rent_amount_gbp") * 12) \
+  .withColumn("rent_per_sqm", col("rent_amount_gbp") / col("area_sqm"))
+```
+
+---
+
+## 2️⃣ KPI DERIVATION
+
+### Example KPIs
+
+* Occupancy rate
+* Vacancy rate
+* Average rent
+* Revenue
+
+---
+
+### Example: Occupancy Rate
+
+```
+occupied_units / total_units
+```
+
+---
+
+### Implementation
+
+```python
+occupancy_kpi = (
+  gold_fact
+    .groupBy("city")
+    .agg(
+      countDistinct(when(col("unit_status") == "OCCUPIED", col("unit_id"))).alias("occupied_units"),
+      countDistinct("unit_id").alias("total_units")
+    )
+    .withColumn("occupancy_rate", col("occupied_units") / col("total_units"))
+)
+```
+
+---
+
+## 3️⃣ TIME-BASED AGGREGATIONS
+
+Gold always supports:
+
+```
+Daily
+Monthly
+Quarterly
+Yearly
+```
+
+---
+
+### Example
+
+```python
+monthly_revenue = (
+  gold_fact
+    .groupBy("year", "month", "city")
+    .agg(sum("rent_amount_gbp").alias("monthly_revenue"))
+)
+```
+
+---
+
+## 4️⃣ ROLLING METRICS (MTD / QTD / YTD)
+
+### Why this is Gold-only
+
+* Requires calendar logic
+* Must be consistent across reports
+
+---
+
+### Example: YTD Revenue
+
+```python
+from pyspark.sql.window import Window
+
+w = Window.partitionBy("year").orderBy("month").rowsBetween(Window.unboundedPreceding, 0)
+
+gold_fact = gold_fact \
+  .withColumn("ytd_revenue", sum("rent_amount_gbp").over(w))
+```
+
+---
+
+## 5️⃣ SNAPSHOT METRICS
+
+### Purpose
+
+Answer:
+
+> “What was the state at that point in time?”
+
+---
+
+### Examples
+
+* Active units as of month-end
+* Portfolio value as of quarter-end
+
+---
+
+### Snapshot table
+
+```
+gold_snapshot_property_monthly
+--------------------------------
+property_id
+snapshot_date
+active_units
+vacant_units
+total_rent
+```
+
+---
+
+### Built using:
+
+* End-of-period filters
+* Latest records
+
+---
+
+## 6️⃣ PRE-AGGREGATED SUMMARY TABLES
+
+### Why Big-4 uses them
+
+* Dashboards load fast
+* Costs reduced
+* Predictable performance
+
+---
+
+### Example summary tables
+
+```
+gold_summary_city_monthly
+gold_summary_property_quarterly
+gold_summary_region_ytd
+```
+
+---
+
+### These tables:
+
+* Are refreshed daily
+* Power most dashboards
+* Rarely change schema
+
+---
+
+## 🧠 FINAL GOLD DENORMALIZATION & AGGREGATION SNAPSHOT
+
+```
+✔ Dimensions pre-joined
+✔ Hierarchies flattened
+✔ Lookups resolved
+✔ KPIs standardized
+✔ Time logic centralized
+✔ Dashboards simplified
+```
+
+---
+
+# 🎯 INTERVIEW-READY SUMMARY (MEMORIZE)
+
+> In the Gold layer, we denormalized data by pre-joining dimensions, flattening hierarchies, and resolving lookups to eliminate runtime joins. We also implemented standardized business metrics, rolling KPIs, snapshot tables, and pre-aggregated summaries to ensure fast and consistent analytics consumption.
+
+---
+
+# 🔒 MEMORY LOCK
+
+```
+Silver = correctness
+Gold   = speed + simplicity
+```
+
+---
+
+If you want next, the **final remaining Gold topics** are:
+
+1️⃣ **Gold Security & Access Control (RLS, CLS, masking)**
+2️⃣ **Gold Release, SLA, and Monitoring**
+3️⃣ **Full Big-4 mock interview (ADF + Airflow + Databricks)**
+
+
+
+
+
+
+
+
+
+
